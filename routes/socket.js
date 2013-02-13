@@ -3,15 +3,30 @@ var request = require('request'),
     BufferList = require('bufferlist').BufferList,
     eventEmitter = require('events').EventEmitter;
 
-var utils = (function () {
+var nationen = (function () {
 
   var events = new eventEmitter
       socket = null,
       posts = [];
 
-  var init = function(body, mainSocket, callback){
-    socket = mainSocket; // setting global socket for utils scope
 
+  var init = function(mainSocket){
+    socket = mainSocket; // setting global socket for nationen scope
+
+    retrieveFrontPage(); // unveil madness!
+  };
+
+  var retrieveFrontPage = function(){
+    request('http://ekstrabladet.dk/', function(error, response, body) {
+      if (error) return console.error(error);
+
+      successMediator(body, function(posts){
+        socket.emit('message:incoming', posts);
+      });
+    });
+  }
+
+  var successMediator = function (body, callback){
     socket.emit('new:status', 'ekstrabladet.dk fetched!');
 
     events.on('posts:fetched', function(){
@@ -27,6 +42,8 @@ var utils = (function () {
     var $ = cheerio.load(body);
 
     var articles = $('div.articles a[href^="http://ekstrabladet"]');
+
+console.log(body);
 
     if (articles.length == 0){
       articles = $('a[href^="http://ekstrabladet"]');
@@ -80,7 +97,7 @@ var utils = (function () {
       retrieveComments($, commentObj);
     }else{
       socket.emit('new:status', 'No comments for this article - finding new article...');
-      findArticle(articleHtml);
+      retrieveFrontPage();
     }
   };
 
@@ -119,7 +136,7 @@ var utils = (function () {
       comment64 = data_uri_prefix + comment64;
 
       return comment64;
-    })
+    });
   };
 
   var sanitizeBogusJSON = function(bogusJSON){
@@ -152,12 +169,6 @@ module.exports = function (socket) {
 	socket.on('app:begin', function (data) {
     socket.emit('new:status', 'Fetching ekstrabladet.dk...');
 
-    request('http://ekstrabladet.dk/', function(error, response, body) {
-      if (error) return console.error(error);
-
-      utils.init(body, socket, function(posts){
-        socket.emit('message:incoming', posts);
-      });
-    });
+    nationen.init(socket);
 	});
 };
