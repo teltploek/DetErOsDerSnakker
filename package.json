@@ -13,6 +13,7 @@
     , "request": "*"
     , "cheerio": "*"
     , "bufferlist": "*"
+    , "strutil": "*"
   }
   , "devDependencies": {
     "grunt": "*",

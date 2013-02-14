@@ -9,6 +9,13 @@ function AppCtrl($scope, socket) {
   // ================
 
   // notify other players that a player is about to connect
+  socket.on('post:fetched', function (comment) {
+    console.log(comment.body);
+
+    var snd = new Audio(comment.bodySoundbite);
+    snd.play();
+  });
+
   socket.on('message:incoming', function (comments) {
     $scope.comments = comments;
 
