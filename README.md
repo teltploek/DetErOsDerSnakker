@@ -2,6 +2,14 @@
 
 Will fetch comments from Ekstra Bladets nationen, and read them out loud. In other words: A multi-billion $ project in the making.
 
+## Why?
+
+Well for one; it's fun! Every person I've mentioned this for has initially laughed, and then shown interest in the project.
+
+Secondly it's a major learning experience. A great opportunity to work on a Node.js Express application. Trying out the (genius!) node packet manager. And hopefully learning how to deploy then thing in the end! Really really interesting.
+
+Thirdly it's a short way to fortune and fame.
+
 ## How to use it
 
 Ehm... don't!(?)
@@ -23,7 +31,9 @@ Right now everything is work in progress, so don't expect anything to work yet.
 
 ## Working on...
 
-Right now I'm working on fetching base64-encoded responses from Google Text-To-Speech service on Node.js server, and passing them on to the front-end through socket.io, when they return.
+ * Getting weird unicode from comment feed translated to readable characters
+ * Slicing up strings in 100 character bulks, sending to Google TTS and stiching up again afterwards
+ * Mocking up the frontend - mostly in my head right now, but should be prototyped somehow
 
 ---
 Wasting time since 1981
