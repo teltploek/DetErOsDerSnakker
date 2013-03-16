@@ -34,7 +34,7 @@ Right now everything is work in progress, so don't expect anything to work yet.
  * Slicing up strings in 100 character bulks, sending to Google TTS and stiching up again afterwards
  * Mocking up the frontend - mostly in my head right now, but should be prototyped somehow
 
- ## Dev TODOs
+## Dev TODOs
 
  * Make ps1-script more generic using relative dirs
 
