@@ -14,7 +14,6 @@
     , "cheerio": "*"
     , "bufferlist": "*"
     , "strutil": "*"
-    , "unidecode": "*"
   }
   , "devDependencies": {
     "grunt": "*",

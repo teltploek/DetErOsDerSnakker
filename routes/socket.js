@@ -118,8 +118,12 @@ var nationen = (function () {
       $(this).find('.comment-inner .comment .body p').each(function(){
         comment.body = comment.body + ' ' + $(this).text();
       });
+  
+      // there are stringified unicode characters in the comment feed - we need to JSON.parse them to get readable characters
+      var parseSource = "{ \"comment\" : \""+ comment.body +"\" }";
+      var parsedComment = JSON.parse(parseSource);
 
-      comment.body = unescape(comment.body);
+      comment.body = parsedComment.comment;
       comment.bodyHTML = comment.body + '<br><br>';
 
       comments.push(comment);
@@ -143,7 +147,7 @@ var nationen = (function () {
   };
 
   var googleTextToSpeech = function(comment){
-    // TODO: Split comment body into parts of hundred characters, and pass them in separately. Stich them together in an array afterwards
+    // TODO: Split comment body into parts of hundred characters, and pass them in separately. Stich them together in an array afterwards   
 
     request({ url : 'http://translate.google.com/translate_tts?ie=utf-8&tl=da&q='+ comment.body.substr(0, 100), headers : { 'Referer' : '' }, encoding: 'binary' }, function(error, response, body){
       if (error) return console.error(error);

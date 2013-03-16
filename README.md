@@ -28,9 +28,13 @@ and point your browser to http://localhost:3000
 
 Right now everything is work in progress, so don't expect anything to work yet.
 
+## Updates
+
+Major break-through! Managed to translate stringified unicode characters from comment-feed to readable characters. This pretty much completes the POC, and ignites the next level - completing the app for a public audience!
+
 ## Working on...
 
- * Getting weird unicode from comment feed translated to readable characters
+ * ~~Getting weird unicode from comment feed translated to readable characters~~ Done!!
  * Slicing up strings in 100 character bulks, sending to Google TTS and stiching up again afterwards
  * Mocking up the frontend - mostly in my head right now, but should be prototyped somehow
 
