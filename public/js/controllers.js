@@ -9,20 +9,12 @@ function AppCtrl($scope, socket) {
   // ================
 
   // notify other players that a player is about to connect
-  socket.on('post:fetched', function (comment) {
-    console.log(comment.body);
+  socket.on('post:fetched', function (commentObj) {
+    $scope.messages.push({ text : 'Soundbites retrieved by frontend - ' + commentObj.bodySoundbites.length + ' in total' });
 
-    var snd = new Audio(comment.bodySoundbite);
-    snd.play();
-  });
+    console.log(commentObj);
 
-  socket.on('message:incoming', function (comments) {
-    $scope.comments = comments;
-
-    console.log(comments);
-
-    var snd = new Audio(comments[0].bodySoundbite);
-    snd.play();
+    playSoundbite(0, commentObj.bodySoundbites);
   });
 
   socket.on('new:status', function(statusMsg){
@@ -33,6 +25,24 @@ function AppCtrl($scope, socket) {
 
   $scope.messages = [];
   $scope.comments = [];
+
+  var playSoundbite = function(idx, soundBites){
+    if (!soundBites[idx]) return;
+
+    var soundBite = soundBites[idx];
+
+    var snd = new Audio(soundBite);
+
+    snd.addEventListener('play', function() { 
+      $scope.messages.push({ text : 'Playing soundbite ' + (1+idx) + ' of ' + soundBites.length });
+    }, true);    
+
+    snd.addEventListener('ended', function() { 
+      playSoundbite(1+idx, soundBites);
+    }, true);   
+    
+    snd.play();
+  };
 
   $scope.pushButton = function () {
     $scope.begun = true;

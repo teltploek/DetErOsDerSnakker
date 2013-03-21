@@ -2,14 +2,28 @@ var request = require('request'),
     cheerio = require('cheerio'),
     BufferList = require('bufferlist').BufferList,
     eventEmitter = require('events').EventEmitter,
-    strutil = require('strutil');
+    strutil = require('strutil'),
+    _ = require('underscore'),
+    winston = require('winston');
+
+var logger = function(filename){
+  return new (winston.Logger)({
+    transports: [
+      new (winston.transports.Console)(),
+      new (winston.transports.File)({ filename: 'logs/' + filename + '.log' })
+    ]
+  });
+}
+
+// facilitate logging
+var applicationLogger = logger('app'),
+    errorLogger = logger('error');
 
 var nationen = (function () {
 
   var events = new eventEmitter
       socket = null,
       comments = [];
-
 
   var init = function(mainSocket){
     socket = mainSocket; // setting global socket for nationen scope
@@ -19,7 +33,7 @@ var nationen = (function () {
 
   var retrieveFrontPage = function(){
     request('http://ekstrabladet.dk/', function(error, response, body) {
-      if (error) return console.error(error);
+      if (error) return errorLogger.log('error', error);
 
       successMediator(body, function(comments){
         socket.emit('message:incoming', comments);
@@ -43,6 +57,8 @@ var nationen = (function () {
 
     var $ = cheerio.load(body);
 
+    $('a[href^="http://ekstrabladet/112"]').remove();
+
     var articles = $('div.articles a[href^="http://ekstrabladet"]');
 
     if (articles.length == 0){
@@ -56,7 +72,7 @@ var nationen = (function () {
 
   var fetchArticle = function(url){
     request(url, function(error, response, body){
-      if (error) return console.error(error);
+      if (error) return errorLogger.log('error', error);
 
       socket.emit('new:status', 'Random article found:');     
 
@@ -79,7 +95,7 @@ var nationen = (function () {
     socket.emit('new:status', 'Fetching nationen comments...');
 
     request(commentsUrl, function(error, response, body){
-      if (error) return console.error(error);
+      if (error) return errorLogger.log('error', error);
 
       parseFeed(articleHtml, body);
     });    
@@ -112,7 +128,9 @@ var nationen = (function () {
         date : $(this).find('.comment-inner .name-date .date').text(),
         body : '',
         bodyHTML : '',
-        rating : $(this).find('.comment-inner .rating-buttons .rating').text()
+        rating : $(this).find('.comment-inner .rating-buttons .rating').text(),
+        bodySoundbites : [], // this array will hold all the base64 encoded sound bites for an entire comment
+        bodySoundbitesIdx : []
       };
 
       $(this).find('.comment-inner .comment .body p').each(function(){
@@ -135,31 +153,95 @@ var nationen = (function () {
   };
 
   var distributeSoundBites = function(){
-    // for (var i = 0; i < comments.length; ++i) {
-      var comment = comments[0];
+    // var length = comments.length,
+    //     i;
+    // for (i = 0; i < length; ++i) {
+    //   var commentObj = comments[i];
+      var commentObj = comments[0];
 
-      googleTextToSpeech(comment);
+      var googleTTSFriendlyComment = splitCommentInGoogleTTSFriendlyBites(commentObj.body); // we need to split comment in to bulks of 100 characters
 
-      events.on('tts:done:' + comment.id, function(){
-        socket.emit('post:fetched', comment);
+      googleTextToSpeech(commentObj, googleTTSFriendlyComment);
+
+      events.on('tts:done:' + commentObj.id, function(){
+        socket.emit('post:fetched', commentObj);
       });
     // }
   };
 
-  var googleTextToSpeech = function(comment){
-    // TODO: Split comment body into parts of hundred characters, and pass them in separately. Stich them together in an array afterwards   
+  var splitCommentInGoogleTTSFriendlyBites = function(comment){   
+    var toSay = [],
+        punct = [',',':',';','.','?','!'],
+        words = comment.split(' '),
+        sentence = '';
 
-    request({ url : 'http://translate.google.com/translate_tts?ie=utf-8&tl=da&q='+ comment.body.substr(0, 100), headers : { 'Referer' : '' }, encoding: 'binary' }, function(error, response, body){
-      if (error) return console.error(error);
+    var wordsLength = words.length,
+        w;
 
-      var data_uri_prefix = "data:" + response.headers["content-type"] + ";base64,";
-      var comment64 = new Buffer(body.toString(), 'binary').toString('base64');                                                                                                                                                                 
-      comment64 = data_uri_prefix + comment64;
+    for (w = 0; w < wordsLength; ++w){
+      var word = words[w],
+          couldBePunct = word.substr(word.length,word.length-1);
 
-      comment.bodySoundbite = comment64;
+      // if we've encountered a punct!
+      if (_.indexOf(punct, couldBePunct) != -1){
+        if (sentence.length + word.length+1 < 100){
+          sentence += ' '+word;
+          toSay.push(sentence.trim());
+        }else{
+          toSay.push(sentence.trim());
+          toSay.push(word.trim());
+        }
+        sentence = '';
+      }else{
+        if (sentence.length + word.length+1 < 100){
+          sentence += ' '+word;
+        }else{
+          toSay.push(sentence.trim());
+          sentence = word;
+        }
+      }
+    }
 
-      events.emit('tts:done:' + comment.id);
-    });
+    if (sentence.length > 0){
+      toSay.push(sentence.trim())
+    }
+
+    return toSay;
+  };
+
+  var googleTextToSpeech = function(commentObj, googleFriendlyCommentArr){
+    var length = googleFriendlyCommentArr.length,
+        conversionQueue = length,
+        i;
+
+    for (i = 0; i < length; ++i){
+      var idx = i,
+          commentPart = googleFriendlyCommentArr[i];
+
+      request({ url : 'http://translate.google.com/translate_tts?deods='+idx+'&ie=utf-8&tl=da&q='+ commentPart, headers : { 'Referer' : '' }, encoding: 'binary' }, function(error, response, body){
+        if (error) return errorLogger.log('error', error);
+
+        var data_uri_prefix = "data:" + response.headers["content-type"] + ";base64,";
+        var comment64 = new Buffer(body.toString(), 'binary').toString('base64');                                                                                                                                                                 
+        comment64 = data_uri_prefix + comment64;
+
+        // FIXME: Major hack to have soundbites arranged in correct order:
+        //        We're passing along the original index in the uri. When the call returns we parse out the uri query in the response to refetch our index
+        // ... we need to rethink this - but right now, we want it working.
+        // "First do it, then do it right, then do it better" - quote: Addy Osmani
+        var soundBiteIdx = response.request.uri.query.split('&')[0].split('=')[1];
+
+        commentObj.bodySoundbites[soundBiteIdx] = comment64;
+
+        conversionQueue = conversionQueue - 1;
+
+        if (conversionQueue == 0){
+          events.emit('tts:done:' + commentObj.id);
+        }
+      });
+
+    }
+
   };
 
   var sanitizeBogusJSON = function(bogusJSON){

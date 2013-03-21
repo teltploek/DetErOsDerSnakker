@@ -35,11 +35,12 @@ Major break-through! Managed to translate stringified unicode characters from co
 ## Working on...
 
  * ~~Getting weird unicode from comment feed translated to readable characters~~ Done!!
- * Slicing up strings in 100 character bulks, sending to Google TTS and stiching up again afterwards
+ * ~~Slicing up strings in 100 character bulks, sending to Google TTS and stiching up again afterwards~~ Done!!
  * Mocking up the frontend - mostly in my head right now, but should be prototyped somehow
 
-## Dev TODOs
+## TODOs
 
+ * Find a way to skip the narrating of web-addresses.
  * Make ps1-script more generic using relative dirs
 
 ---

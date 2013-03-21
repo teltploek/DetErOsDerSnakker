@@ -1,23 +1,32 @@
 {
-    "name": "DetErOsDerSnakker"
-  , "version": "0.0.1"
-  , "author": {
-  		"name" 	: "Brian Frisch",
-  		"email"	: "brian@frisch.io"
-	}
-  , "private": false
-  , "dependencies": {
-      "express": "3.0.0"
-    , "jade": ">= 0.0.1"
-    , "socket.io": ">= 0.9.6"
-    , "request": "*"
-    , "cheerio": "*"
-    , "bufferlist": "*"
-    , "strutil": "*"
-  }
-  , "devDependencies": {
-    "grunt": "*",
-    "grunt-compass": "*",
-    "compass": "*"
-  }
+    "name": "DetErOsDerSnakker",
+    "version": "0.0.1",
+    "author": {
+        "name": "Brian Frisch",
+        "email": "brian@frisch.io"
+    },
+    "private": false,
+    "dependencies": {
+        "express": "3.0.0",
+        "jade": ">= 0.0.1",
+        "socket.io": ">= 0.9.6",
+        "request": "*",
+        "cheerio": "*",
+        "bufferlist": "*",
+        "strutil": "*",
+        "underscore": "*",
+        "winston": "*"
+    },
+    "devDependencies": {
+        "grunt": "*",
+        "grunt-compass": "*",
+        "compass": "*"
+    },
+    "subdomain": "deterosdersnakker",
+    "scripts": {
+        "start": "node app.js"
+    },
+    "engines": {
+        "node": "0.8.x"
+    }
 }
