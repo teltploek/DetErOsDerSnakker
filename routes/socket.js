@@ -6,6 +6,7 @@ var request = require('request'),
     _ = require('underscore'),
     winston = require('winston');
 
+// TODO: move this to app.js
 var logger = function(filename){
   return new (winston.Logger)({
     transports: [
@@ -26,6 +27,8 @@ var nationen = (function () {
       comments = [];
 
   var init = function(mainSocket){
+    comments = [];
+    
     socket = mainSocket; // setting global socket for nationen scope
 
     retrieveFrontPage(); // unveil madness!
@@ -57,6 +60,7 @@ var nationen = (function () {
 
     var $ = cheerio.load(body);
 
+    // we remove articles that we know doesn't have comments - 112 articles doesn't
     $('a[href^="http://ekstrabladet/112"]').remove();
 
     var articles = $('div.articles a[href^="http://ekstrabladet"]');
@@ -78,7 +82,7 @@ var nationen = (function () {
 
       var $ = cheerio.load(body);
 
-      socket.emit('new:status', '<a href="'+url+'" target="_blank">' + $('h1.rubrik').first().text() + '</a>');
+      socket.emit('new:status', '' + $('h1.rubrik').first().text() + ' - ' + url);
 
       fetchComments($, url);
     });
@@ -161,7 +165,7 @@ var nationen = (function () {
 
       var googleTTSFriendlyComment = splitCommentInGoogleTTSFriendlyBites(commentObj.body); // we need to split comment in to bulks of 100 characters
 
-      googleTextToSpeech(commentObj, googleTTSFriendlyComment);
+      converCommentsToAudio(commentObj, googleTTSFriendlyComment);
 
       events.on('tts:done:' + commentObj.id, function(){
         socket.emit('post:fetched', commentObj);
@@ -209,7 +213,7 @@ var nationen = (function () {
     return toSay;
   };
 
-  var googleTextToSpeech = function(commentObj, googleFriendlyCommentArr){
+  var converCommentsToAudio = function(commentObj, googleFriendlyCommentArr){
     var length = googleFriendlyCommentArr.length,
         conversionQueue = length,
         i;
@@ -218,7 +222,7 @@ var nationen = (function () {
       var idx = i,
           commentPart = googleFriendlyCommentArr[i];
 
-      request({ url : 'http://translate.google.com/translate_tts?deods='+idx+'&ie=utf-8&tl=da&q='+ commentPart, headers : { 'Referer' : '' }, encoding: 'binary' }, function(error, response, body){
+      googleTextToSpeech('http://translate.google.com/translate_tts?deods='+idx+'&ie=utf-8&tl=da&q='+ commentPart, function(error, response, body){
         if (error) return errorLogger.log('error', error);
 
         var data_uri_prefix = "data:" + response.headers["content-type"] + ";base64,";
@@ -241,8 +245,11 @@ var nationen = (function () {
       });
 
     }
-
   };
+
+  var googleTextToSpeech = function(url, callback){
+    request({ url : url, headers : { 'Referer' : '' }, encoding: 'binary' }, callback);
+  }
 
   var sanitizeBogusJSON = function(bogusJSON){
     var content = bogusJSON.toString('utf8');

@@ -5,12 +5,8 @@
 function AppCtrl($scope, socket) {
   $scope.begun = false;
 
-  // Socket listeners (broadcasts)
-  // ================
-
-  // notify other players that a player is about to connect
   socket.on('post:fetched', function (commentObj) {
-    $scope.messages.push({ text : 'Soundbites retrieved by frontend - ' + commentObj.bodySoundbites.length + ' in total' });
+    $scope.messages.push({ text : 'Soundbites retrieved by frontend - ' + commentObj.bodySoundbites.length + ' bites in total' });
 
     console.log(commentObj);
 
@@ -20,8 +16,6 @@ function AppCtrl($scope, socket) {
   socket.on('new:status', function(statusMsg){
     $scope.messages.push({ text : statusMsg });
   });
-
-  // ---
 
   $scope.messages = [];
   $scope.comments = [];
@@ -33,6 +27,7 @@ function AppCtrl($scope, socket) {
 
     var snd = new Audio(soundBite);
 
+    // FIXME: this isn't working...
     snd.addEventListener('play', function() { 
       $scope.messages.push({ text : 'Playing soundbite ' + (1+idx) + ' of ' + soundBites.length });
     }, true);    
@@ -46,8 +41,7 @@ function AppCtrl($scope, socket) {
 
   $scope.pushButton = function () {
     $scope.begun = true;
-    // TODO: do nice countdown modal
   	
-    socket.emit('app:begin'); // TODO: apply localStorage to prevent already shown messages to appear
+    socket.emit('app:begin');
   };
 }
