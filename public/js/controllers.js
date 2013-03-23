@@ -4,36 +4,60 @@
 
 function AppCtrl($scope, socket) {
   $scope.begun = false;
+  $scope.commentsHtml = [];
+  $scope.commentVisible = false;
 
-  socket.on('post:fetched', function (commentObj) {
-    $scope.messages.push({ text : 'Soundbites retrieved by frontend - ' + commentObj.bodySoundbites.length + ' bites in total' });
+  $scope.messages = [];
+  $scope.comments = [];
 
-    console.log(commentObj);
+  socket.on('post:fetched', function (allCommentsArr) {
+    console.log(allCommentsArr);
 
-    playSoundbite(0, commentObj.bodySoundbites);
+    $scope.comments = allCommentsArr;
+
+    $scope.messages.push({ text : 'All comments for article received by front-end - getting ready to play...' });
+
+    initializeComment(0);
   });
 
   socket.on('new:status', function(statusMsg){
     $scope.messages.push({ text : statusMsg });
   });
 
-  $scope.messages = [];
-  $scope.comments = [];
+  var initializeComment = function(commentIdx){
+    var comments = $scope.comments;
 
-  var playSoundbite = function(idx, soundBites){
-    if (!soundBites[idx]) return;
+    if (!comments[commentIdx]){
+      $scope.begun = false;
 
-    var soundBite = soundBites[idx];
+      return;
+    }
+
+    console.log(comments[commentIdx].bodyHTML);
+
+    $scope.commentsHtml.push(comments[commentIdx]);
+
+    playSoundbite(commentIdx, 0);
+  };
+
+  var playSoundbite = function(commentIdx, biteIdx){
+    var soundBites = $scope.comments[commentIdx].bodySoundbites;
+
+    if (!soundBites[biteIdx]){
+      initializeComment(1+commentIdx);
+    }
+
+    var soundBite = soundBites[biteIdx];
 
     var snd = new Audio(soundBite);
 
-    // FIXME: this isn't working...
+    // FIXME: this isn't working - wrong event I guess
     snd.addEventListener('play', function() { 
-      $scope.messages.push({ text : 'Playing soundbite ' + (1+idx) + ' of ' + soundBites.length });
+      $scope.messages.push({ text : 'Playing soundbite ' + (1+biteIdx) + ' of ' + soundBites.length });
     }, true);    
 
     snd.addEventListener('ended', function() { 
-      playSoundbite(1+idx, soundBites);
+      playSoundbite(commentIdx, 1+biteIdx);
     }, true);   
     
     snd.play();

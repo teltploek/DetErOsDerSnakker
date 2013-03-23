@@ -40,7 +40,7 @@ Major break-through! Managed to translate stringified unicode characters from co
 
 ## TODOs
 
- * Find a way to skip the narrating of web-addresses.
+ * Find a way to skip the narrating of web-addresses, smileys etc.
  * Make ps1-script more generic using relative dirs
 
 ---

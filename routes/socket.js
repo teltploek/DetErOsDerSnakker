@@ -6,7 +6,7 @@ var request = require('request'),
     _ = require('underscore'),
     winston = require('winston');
 
-// TODO: move this to app.js
+// TODO: move all logging-stuff to app.js
 var logger = function(filename){
   return new (winston.Logger)({
     transports: [
@@ -25,6 +25,21 @@ var nationen = (function () {
   var events = new eventEmitter
       socket = null,
       comments = [];
+
+  // we need a couple of hardcoded messages in the system, that we need to pass along to Google TTS as well
+  var narration = {
+    cycle: {
+      answer : 'Svar til foregående kommentar'
+    },
+    author : {
+      by : 'Kommentar af indsendt af',
+      when : 'den '
+    },
+    rating: {
+      '+' : 'Plus',
+      '-' : 'Minus'
+    }
+  };
 
   var init = function(mainSocket){
     comments = [];
@@ -125,20 +140,21 @@ var nationen = (function () {
     socket.emit('new:status', 'Comments found - retrieving comments...');
 
     commentObj.each(function(idx, elm){
+
       var comment = {
         id : idx,
-        avatarUrl : $(this).find('.comment-inner .avatar img').attr('src'),
-        name : $(this).find('.comment-inner .name-date .name').text(),
-        date : $(this).find('.comment-inner .name-date .date').text(),
+        avatarUrl : $(elm).find('.comment-inner .avatar img').attr('src'),
+        name : $(elm).find('.comment-inner .name-date .name').text(),
+        date : $(elm).find('.comment-inner .name-date .date').text(),
         body : '',
         bodyHTML : '',
-        rating : $(this).find('.comment-inner .rating-buttons .rating').text(),
+        rating : $(elm).find('.comment-inner .rating-buttons .rating').text(),
         bodySoundbites : [], // this array will hold all the base64 encoded sound bites for an entire comment
         bodySoundbitesIdx : []
       };
 
-      $(this).find('.comment-inner .comment .body p').each(function(){
-        comment.body = comment.body + ' ' + $(this).text();
+      $(elm).find('.comment-inner .comment .body p').each(function(idx, elm){
+        comment.body = comment.body + ' ' + $(elm).text();
       });
   
       // there are stringified unicode characters in the comment feed - we need to JSON.parse them to get readable characters
@@ -146,7 +162,7 @@ var nationen = (function () {
       var parsedComment = JSON.parse(parseSource);
 
       comment.body = parsedComment.comment;
-      comment.bodyHTML = comment.body + '<br><br>';
+      comment.bodyHTML = comment.body;
 
       comments.push(comment);
     });   
@@ -157,22 +173,30 @@ var nationen = (function () {
   };
 
   var distributeSoundBites = function(){
-    // var length = comments.length,
-    //     i;
-    // for (i = 0; i < length; ++i) {
-    //   var commentObj = comments[i];
-      var commentObj = comments[0];
+    var length = comments.length,
+        allCommentQueue = length,
+        i;
+
+    for (i = 0; i < length; ++i) {
+      var commentObj = comments[i];
 
       var googleTTSFriendlyComment = splitCommentInGoogleTTSFriendlyBites(commentObj.body); // we need to split comment in to bulks of 100 characters
 
       converCommentsToAudio(commentObj, googleTTSFriendlyComment);
 
       events.on('tts:done:' + commentObj.id, function(){
-        socket.emit('post:fetched', commentObj);
+        comments.push(commentObj);
+
+        allCommentQueue = allCommentQueue - 1;
+
+        if (allCommentQueue == 0){
+          socket.emit('post:fetched', comments);
+        }
       });
-    // }
+    }
   };
 
+  // TODO: add space after all puncts - and remove double spaces afterwards - TTS has trouble with words that comes right after a punct sign
   var splitCommentInGoogleTTSFriendlyBites = function(comment){   
     var toSay = [],
         punct = [',',':',';','.','?','!'],
@@ -225,9 +249,7 @@ var nationen = (function () {
       googleTextToSpeech('http://translate.google.com/translate_tts?deods='+idx+'&ie=utf-8&tl=da&q='+ commentPart, function(error, response, body){
         if (error) return errorLogger.log('error', error);
 
-        var data_uri_prefix = "data:" + response.headers["content-type"] + ";base64,";
-        var comment64 = new Buffer(body.toString(), 'binary').toString('base64');                                                                                                                                                                 
-        comment64 = data_uri_prefix + comment64;
+        var comment64 = convertTTSResponseToBase64(response, body);
 
         // FIXME: Major hack to have soundbites arranged in correct order:
         //        We're passing along the original index in the uri. When the call returns we parse out the uri query in the response to refetch our index
@@ -243,13 +265,19 @@ var nationen = (function () {
           events.emit('tts:done:' + commentObj.id);
         }
       });
-
     }
   };
 
   var googleTextToSpeech = function(url, callback){
     request({ url : url, headers : { 'Referer' : '' }, encoding: 'binary' }, callback);
-  }
+  };
+
+  var convertTTSResponseToBase64 = function(response, body){
+    var data_uri_prefix = 'data:' + response.headers['content-type'] + ';base64,';
+    var comment64 = new Buffer(body.toString(), 'binary').toString('base64');
+
+    return data_uri_prefix + comment64;
+  };
 
   var sanitizeBogusJSON = function(bogusJSON){
     var content = bogusJSON.toString('utf8');

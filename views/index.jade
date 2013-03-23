@@ -6,16 +6,18 @@ block body
       h1 DET ER OS DER SNAKKER
         p Nationen on roids!
     .row
-      .span12
+      .span12(ng-show='!begun')
         fieldset
-          div(ng-show='!begun')
+          div
             form(ng-submit='pushButton()')
               input.btn-large.btn-primary(type='submit', value='UNVEIL MADNESS')
-
-    hr
-    .row
-      .span12
-        p(ng-repeat='comment in comments') {{comment.body}}
-    .row
-      .span12
-        p(ng-repeat='message in messages') {{message.text}}
+      .span12(ng-show='begun')
+        .row
+          .span8
+            div(ng-repeat='comment in commentsHtml')
+              img.polaroid(src='{{comment.avatarUrl}}')
+              div {{comment.bodyHTML}}
+          .span4
+            h3 what's going on?
+            .well.console
+              p(ng-repeat='message in messages') {{message.text}}
