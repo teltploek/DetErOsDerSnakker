@@ -4,6 +4,9 @@
 
 function AppCtrl($scope, socket) {
   $scope.begun = false;
+
+  $scope.articleData = {};
+
   $scope.commentsHtml = [];
   $scope.commentVisible = false;
 
@@ -22,6 +25,16 @@ function AppCtrl($scope, socket) {
     $scope.messages.push({ text : statusMsg });
   });
 
+  socket.on('article:found', function(articleData){
+    console.log(articleData);
+
+    setTimeout(function () {
+        $scope.$apply(function () {
+          $scope.articleData = articleData;
+          });
+    }, 1);
+  });
+
   var initializeComment = function(commentIdx){
     var comments = $scope.comments;
 
@@ -30,8 +43,6 @@ function AppCtrl($scope, socket) {
 
       return;
     }
-
-    console.log(comments[commentIdx].bodyHTML);
 
     setTimeout(function () {
         $scope.$apply(function () {

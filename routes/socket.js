@@ -97,7 +97,14 @@ var nationen = (function () {
 
       var $ = cheerio.load(body);
 
-      socket.emit('new:status', '' + $('h1.rubrik').first().text() + ' - ' + url);
+      var articleData = {
+        title : $('h1.rubrik').first().text(),
+        href  : url
+      }
+
+      socket.emit('new:status', '' + articleData.title + ' - ' + articleData.href);
+
+      socket.emit('article:found', articleData);
 
       fetchComments($, url);
     });
@@ -108,8 +115,9 @@ var nationen = (function () {
   };
 
   var fetchComments = function(articleHtml, url){
-    var articleID = parseArticleID(url),
-        commentsUrl = 'http://orange.ekstrabladet.dk/comments/get.json?disable_new_comments=false&target=comments&comments_expand=true&notification=comment&id='+articleID+'&client_width=610&max_level=100&context=default';
+    var articleID = parseArticleID(url);
+
+    var commentsUrl = 'http://orange.ekstrabladet.dk/comments/get.json?disable_new_comments=false&target=comments&comments_expand=true&notification=comment&id='+articleID+'&client_width=610&max_level=100&context=default';
    
     socket.emit('new:status', 'Fetching nationen comments...');
 

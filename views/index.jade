@@ -13,13 +13,22 @@ block body
               input.btn-large.btn-primary(type='submit', value='UNVEIL MADNESS')
       .span12(ng-show='begun')
         .row
-          .span8
-            .row.well(ng-repeat='comment in commentsHtml')
-              .span2
-                img.polaroid(src='{{comment.avatarUrl}}')
-              .span6
-                div {{comment.bodyHTML}}
+          .span8 &nbsp;
+              legend
+                a(href='{{articleData.href}}', target='_blank') {{articleData.title}}
+              .row(ng-repeat='comment in commentsHtml')
+                .span8
+                  .row
+                    .span8
+                      h5 {{comment.name}} - {{comment.date}}
+                  .row
+                    .span1
+                      img.polaroid(src='{{comment.avatarUrl}}')
+                    .span7
+                      div {{comment.bodyHTML}}
+                .clearfix
+                hr
           .span4
-            h3 what's going on?
+            legend Console
             .well.console
               p(ng-repeat='message in messages') {{message.text}}
