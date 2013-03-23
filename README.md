@@ -2,11 +2,13 @@
 
 Will fetch comments from Ekstra Bladets nationen, and read them out loud. In other words: A multi-billion $ project in the making.
 
+[![ScreenShot](https://raw.github.com/teltploek/DetErOsDerSnakker/tree/master/ressources/youtubeScreenshot.png)](http://youtu.be/vt5fpE0bzSY)
+
 ## Why?
 
 Well for one; it's fun! Every person I've mentioned this for has initially laughed, and then shown interest in the project.
 
-Secondly it's a major learning experience. A great opportunity to work on a Node.js Express application. Trying out the (genius!) node packet manager. And hopefully learning how to deploy the thing in the end! Really really interesting.
+Secondly it's a major learning experience. A great opportunity to work on a Node.js Express application. Trying out the (genius!) node package manager. And hopefully learning how to deploy the thing in the end! Really really interesting.
 
 Thirdly it's a short way to fortune and fame.
 

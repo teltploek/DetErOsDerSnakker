@@ -137,6 +137,8 @@ var nationen = (function () {
     var commentObj = $('li.comment');
 
     if (commentObj.length){
+      socket.emit('article:comments', commentObj.length);
+
       retrieveComments(content);
     }else{
       socket.emit('new:status', 'No comments for this article - finding new article...');
@@ -200,6 +202,8 @@ var nationen = (function () {
         comments.push(commentObj);
 
         allCommentQueue = allCommentQueue - 1;
+
+        socket.emit('progress:update', allCommentQueue);
 
         if (allCommentQueue == 0){
           socket.emit('post:fetched', comments);

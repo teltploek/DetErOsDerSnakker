@@ -9,13 +9,15 @@ block body
       .span12(ng-show='!begun')
         fieldset
           div
-            form(ng-submit='pushButton()')
+            form.unveil-madness(ng-submit='pushButton()')
               input.btn-large.btn-primary(type='submit', value='UNVEIL MADNESS')
       .span12(ng-show='begun')
         .row
           .span8 &nbsp;
               legend
                 a(href='{{articleData.href}}', target='_blank') {{articleData.title}}
+              .pull-left {{numberOfComments}} kommentarer
+
               .row(ng-repeat='comment in commentsHtml')
                 .span8
                   .row
@@ -29,6 +31,18 @@ block body
                 .clearfix
                 hr
           .span4
-            legend Console
+            legend Status           
             .well.console
               p(ng-repeat='message in messages') {{message.text}}
+
+  .modal.hide.fade.progress-modal(ng-controller='AppCtrl')
+    .modal-header
+      h3 Wait for it...
+    .modal-body
+      p Converting {{numberOfComments}} comments to sound.
+
+      p This might take a little while.
+
+      .progress-wrapper(style='width:80%;margin:0 auto;')
+        .progress.progress-striped.active
+          .bar(style='width: {{progress}}%;') {{progressText}}

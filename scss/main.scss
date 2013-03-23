@@ -5,10 +5,18 @@
 }
 
 .console{
-	font-family: fixedsys;
+	font-family: courier;
 	font-size:11px;
 	height:400px;
 	max-height: 400px;
 	overflow-x:hidden;
 	overflow-y:auto;
+}
+.unveil-madness{
+	margin:0 auto;
+}
+
+.progress-wrapper{
+	margin:0 auto;
+	width:80%;
 }

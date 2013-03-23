@@ -6,6 +6,10 @@ function AppCtrl($scope, socket) {
   $scope.begun = false;
 
   $scope.articleData = {};
+  $scope.numberOfComments = 0;
+
+  $scope.progress = 0;
+  $scope.progressText = '';
 
   $scope.commentsHtml = [];
   $scope.commentVisible = false;
@@ -16,21 +20,48 @@ function AppCtrl($scope, socket) {
   socket.on('post:fetched', function (allCommentsArr) {
     $scope.comments = allCommentsArr;
 
-    $scope.messages.push({ text : 'All comments for article received by front-end - getting ready to play...' });
+    $scope.messages.push({ text : 'All comments for article received by front-end - getting ready to play...' });   
 
-    initializeComment(0);
+    setTimeout(function(){
+      $('.progress-modal').modal('hide');
+      initializeComment(0);
+    }, 1500)
   });
 
   socket.on('new:status', function(statusMsg){
     $scope.messages.push({ text : statusMsg });
   });
 
-  socket.on('article:found', function(articleData){
-    console.log(articleData);
+  socket.on('progress:update', function(status){
+    if ($scope.progress == 0){
+      $('.progress-modal').modal('show');
+    }
+
+    var newProgress = ($scope.numberOfComments - status) / $scope.numberOfComments * 100,
+        newProgressText = ($scope.numberOfComments - status) + ' / ' + $scope.numberOfComments;
 
     setTimeout(function () {
         $scope.$apply(function () {
+          $scope.progress = newProgress;
+          $scope.progressText = newProgressText;
+          });
+    }, 1);
+  });
+
+  // when article has been found, we can show the title
+  socket.on('article:found', function(articleData){
+    setTimeout(function () {
+        $scope.$apply(function () {
           $scope.articleData = articleData;
+          });
+    }, 1);
+  });
+
+  // when comments has been found, we can show the number of comments
+  socket.on('article:comments', function(comments){
+    setTimeout(function () {
+        $scope.$apply(function () {
+          $scope.numberOfComments = comments;
           });
     }, 1);
   });
@@ -63,10 +94,6 @@ function AppCtrl($scope, socket) {
     var soundBite = soundBites[biteIdx];
 
     var snd = new Audio(soundBite);
-
-    snd.addEventListener('play', function() {
-      $scope.messages.push({ text : 'Playing soundbite ' + (1+biteIdx) + ' of ' + soundBites.length });
-    }, true);    
 
     snd.addEventListener('ended', function() { 
       playSoundbite(commentIdx, 1+biteIdx);
