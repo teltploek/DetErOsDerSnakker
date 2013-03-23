@@ -30,6 +30,12 @@ Right now everything is work in progress, so don't expect anything to work yet.
 
 ## Updates
 
+March 23
+
+Putting things together - it's starting to look promising...
+
+March 17
+
 Major break-through! Managed to translate stringified unicode characters from comment-feed to readable characters. This pretty much completes the POC, and ignites the next level - completing the app for a public audience!
 
 ## Working on...
