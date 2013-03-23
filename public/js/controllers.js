@@ -11,8 +11,6 @@ function AppCtrl($scope, socket) {
   $scope.comments = [];
 
   socket.on('post:fetched', function (allCommentsArr) {
-    console.log(allCommentsArr);
-
     $scope.comments = allCommentsArr;
 
     $scope.messages.push({ text : 'All comments for article received by front-end - getting ready to play...' });
@@ -35,7 +33,11 @@ function AppCtrl($scope, socket) {
 
     console.log(comments[commentIdx].bodyHTML);
 
-    $scope.commentsHtml.push(comments[commentIdx]);
+    setTimeout(function () {
+        $scope.$apply(function () {
+            $scope.commentsHtml.push(comments[commentIdx]);
+        });
+    }, 1);
 
     playSoundbite(commentIdx, 0);
   };
@@ -51,8 +53,7 @@ function AppCtrl($scope, socket) {
 
     var snd = new Audio(soundBite);
 
-    // FIXME: this isn't working - wrong event I guess
-    snd.addEventListener('play', function() { 
+    snd.addEventListener('play', function() {
       $scope.messages.push({ text : 'Playing soundbite ' + (1+biteIdx) + ' of ' + soundBites.length });
     }, true);    
 

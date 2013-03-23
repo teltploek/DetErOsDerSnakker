@@ -14,9 +14,11 @@ block body
       .span12(ng-show='begun')
         .row
           .span8
-            div(ng-repeat='comment in commentsHtml')
-              img.polaroid(src='{{comment.avatarUrl}}')
-              div {{comment.bodyHTML}}
+            .row.well(ng-repeat='comment in commentsHtml')
+              .span2
+                img.polaroid(src='{{comment.avatarUrl}}')
+              .span6
+                div {{comment.bodyHTML}}
           .span4
             h3 what's going on?
             .well.console

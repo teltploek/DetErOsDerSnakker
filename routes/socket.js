@@ -129,32 +129,36 @@ var nationen = (function () {
     var commentObj = $('li.comment');
 
     if (commentObj.length){
-      retrieveComments($, commentObj);
+      retrieveComments(content);
     }else{
       socket.emit('new:status', 'No comments for this article - finding new article...');
       retrieveFrontPage();
     }
   };
 
-  var retrieveComments = function($, commentObj){
+  var retrieveComments = function(content){
+    var $ = cheerio.load(content),
+        i = 0;
+    
     socket.emit('new:status', 'Comments found - retrieving comments...');
 
-    commentObj.each(function(idx, elm){
+    $('li.comment').each(function(){
+      i++;
 
       var comment = {
-        id : idx,
-        avatarUrl : $(elm).find('.comment-inner .avatar img').attr('src'),
-        name : $(elm).find('.comment-inner .name-date .name').text(),
-        date : $(elm).find('.comment-inner .name-date .date').text(),
+        id : i,
+        avatarUrl : $(this).find('.comment-inner').first().find('.avatar img').attr('src'),
+        name : $(this).find('.comment-inner').first().find('.name-date .name').text(),
+        date : $(this).find('.comment-inner').first().find('.name-date .date').text(),
         body : '',
         bodyHTML : '',
-        rating : $(elm).find('.comment-inner .rating-buttons .rating').text(),
+        rating : $(this).find('.comment-inner').first().find('.rating-buttons .rating').text(),
         bodySoundbites : [], // this array will hold all the base64 encoded sound bites for an entire comment
         bodySoundbitesIdx : []
       };
 
-      $(elm).find('.comment-inner .comment .body p').each(function(idx, elm){
-        comment.body = comment.body + ' ' + $(elm).text();
+      $(this).find('.comment-inner').first().find('.body p').each(function(i, elem){
+        comment.body = comment.body + ' ' + $(elem).text();
       });
   
       // there are stringified unicode characters in the comment feed - we need to JSON.parse them to get readable characters
