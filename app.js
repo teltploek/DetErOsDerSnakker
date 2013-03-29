@@ -62,7 +62,7 @@ io.sockets.on('connection', function(socket){
   var N = new Nationen(io, socket, roomID);
 
   socket.on('app:begin', function(){
-    N._retrieveFrontPage();
+    N.retrieveFrontPage();
   });
 });
 

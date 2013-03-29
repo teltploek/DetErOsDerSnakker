@@ -8,17 +8,17 @@ block body
     .row
       .span12(ng-show='!begun')
         fieldset
-          div
+          .button-wrapper
             form.unveil-madness(ng-submit='pushButton()')
               input.btn-large.btn-primary(type='submit', value='UNVEIL MADNESS')
-      .span12(ng-show='begun')
+      .span12(ng-cloak,ng-show='begun')
         .row
-          .span8 &nbsp;
+          .span8
               legend
                 a(href='{{articleData.href}}', target='_blank') {{articleData.title}}
               .pull-left {{numberOfComments}} kommentarer
 
-              .row(ng-repeat='comment in commentsHtml')
+              .row(ng-repeat='comment in commentsHtml | reverse')
                 .span8
                   .row
                     .span8
@@ -26,8 +26,11 @@ block body
                   .row
                     .span1
                       img.polaroid(src='{{comment.avatarUrl}}')
-                    .span7
+                    .span7.comment-wrapper
                       div {{comment.bodyHTML}}
+                      .rating
+                        em
+                          {{comment.rating}}
                 .clearfix
                 hr
           .span4

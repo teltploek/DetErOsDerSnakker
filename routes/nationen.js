@@ -21,6 +21,15 @@ var request = require('request'),
  */
 exports = module.exports = Nationen;
 
+/**
+ * Nationen constructor.
+ *
+ * @param {socket.io} io sockets express instance
+ * @param {socket} socket instance
+ * @param {String} namespace the socket belongs to
+ * @api public
+ */
+
 function Nationen(mainIO, mainSocket, roomID) {
   var me = this;
 
@@ -32,7 +41,13 @@ function Nationen(mainIO, mainSocket, roomID) {
   this.comments = [];
 };
 
-Nationen.prototype._retrieveFrontPage = function(){
+/**
+ * Scrape front page
+ *
+ * @api public
+ */
+
+Nationen.prototype.retrieveFrontPage = function(){
 	var me = this;
 
 	request('http://ekstrabladet.dk/', function(error, response, body) {
@@ -44,18 +59,28 @@ Nationen.prototype._retrieveFrontPage = function(){
 	});
 };
 
+/**
+ * Mediator for successful callback for front page scrape
+ *
+ * @param {String} the fetched body html
+ * @param {Function} which method to call, when we're ready to send data to front end
+ * @api private
+ */
+
 Nationen.prototype._successMediator = function(body, callback){
 	var me = this;
 
 	this.mainIO.sockets.in(this.roomID).emit('new:status', 'ekstrabladet.dk fetched!');
 
-	// FIXME: We might not need this - we need to make it event based due to asyncronous nature of Google TTS call... think it through, matey
-	this.events.on('comments:fetched', function(){
-		callback(me.comments);
-	});
-
 	this._findArticle(body);
 };
+
+/**
+ * Find article url for which to parse comments from
+ *
+ * @param {String} the document body html
+ * @api private
+ */
 
 Nationen.prototype._findArticle = function(body){
     this.mainIO.sockets.in(this.roomID).emit('new:status', 'Fetching random article...');
@@ -75,6 +100,13 @@ Nationen.prototype._findArticle = function(body){
 
     this._fetchArticle(randomArticle.attr('href'));
 };
+
+/**
+ * Fetch article by url
+ *
+ * @param {String} the url for the article we wish to fetch
+ * @api private
+ */
 
 Nationen.prototype._fetchArticle = function(url){
 	var me = this;
@@ -107,6 +139,8 @@ Nationen.prototype._fetchComments = function(articleHtml, url){
 	var me = this,
 		articleID = this._parseArticleID(url);
 
+	articleID = '1945143';
+
 	var commentsUrl = 'http://orange.ekstrabladet.dk/comments/get.json?disable_new_comments=false&target=comments&comments_expand=true&notification=comment&id='+articleID+'&client_width=610&max_level=100&context=default';
 
 	this.mainIO.sockets.in(this.roomID).emit('new:status', 'Fetching nationen comments...');
@@ -132,7 +166,7 @@ Nationen.prototype._parseFeed = function(articleHtml, body){
       this._retrieveComments(content);
     }else{
       this.mainIO.sockets.in(this.roomID).emit('new:status', 'No comments for this article - finding new article...');
-      this._retrieveFrontPage();
+      this.retrieveFrontPage();
     }
 };
 
@@ -144,8 +178,6 @@ Nationen.prototype._retrieveComments = function(content){
     this.mainIO.sockets.in(this.roomID).emit('new:status', 'Comments found - retrieving comments...');
 
     $('li.comment').each(function(){
-      i++;
-
       var comment = {
         id : i,
         avatarUrl : $(this).find('.comment-inner').first().find('.avatar img').attr('src'),
@@ -155,7 +187,8 @@ Nationen.prototype._retrieveComments = function(content){
         bodyHTML : '',
         rating : $(this).find('.comment-inner').first().find('.rating-buttons .rating').text(),
         bodySoundbites : [], // this array will hold all the base64 encoded sound bites for an entire comment
-        bodySoundbitesIdx : []
+        bodySoundbitesIdx : [],
+        bodySoundbitesText: []
       };
 
       $(this).find('.comment-inner').first().find('.body p').each(function(i, elem){
@@ -170,6 +203,8 @@ Nationen.prototype._retrieveComments = function(content){
       comment.bodyHTML = comment.body;
 
       me.comments.push(comment);
+
+      i++;
     });   
 
     this.mainIO.sockets.in(this.roomID).emit('new:status', 'All comments retrieved. Running them by Google TTS...');
@@ -181,34 +216,45 @@ Nationen.prototype._distributeSoundBites = function(){
 	var me = this,
 		length = this.comments.length,
 	    allCommentQueue = length,
-	    i;
+	    i,
+	    convertedComments = [];
 
 	for (i = 0; i < length; ++i) {
 	  var commentObj = this.comments[i];
 
 	  var googleTTSFriendlyComment = this._splitCommentInGoogleTTSFriendlyBites(commentObj.body); // we need to split comment in to bulks of 100 characters
+	  commentObj.bodySoundbitesText = googleTTSFriendlyComment;
 
 	  this._converCommentsToAudio(commentObj, googleTTSFriendlyComment);
 
-	  this.events.on('tts:done:' + commentObj.id, function(){
-	    me.comments.push(commentObj); // FIXME: do we add comments yet again here? Find out if this is a mistake
+	  this.events.on('tts:done:' + commentObj.id, function(finishedCommentObj){
+	    convertedComments[finishedCommentObj.id] = finishedCommentObj;
 
 	    allCommentQueue = allCommentQueue - 1;
 
 	    me.mainIO.sockets.in(me.roomID).emit('progress:update', allCommentQueue);
 
+	    // TODO: find out why the comments are returned twice
 	    if (allCommentQueue == 0){
-	      me.mainIO.sockets.in(me.roomID).emit('post:fetched', me.comments);
+	      me.mainIO.sockets.in(me.roomID).emit('post:fetched', convertedComments);
 	    }
 	  });
 	}
 };
 
-// TODO: add space after all puncts - and remove double spaces afterwards - TTS has trouble with words that comes right after a punct sign
 Nationen.prototype._splitCommentInGoogleTTSFriendlyBites = function(comment){
 	var toSay = [],
-	    punct = [',',':',';','.','?','!'],
-	    words = comment.split(' '),
+	    punct = [',',':',';','.','?','!'];
+
+	// put space after each an every punct sign
+    _.each(punct, function(val){
+    	comment = comment.split(val).join(val + ' ');
+    });
+
+    // remove double spaces
+    comment = comment.split('  ').join(' ');
+
+	var words = comment.split(' '),
 	    sentence = '';
 
 	var wordsLength = words.length,
@@ -216,12 +262,12 @@ Nationen.prototype._splitCommentInGoogleTTSFriendlyBites = function(comment){
 
 	for (w = 0; w < wordsLength; ++w){
 	  var word = words[w],
-	      couldBePunct = word.substr(word.length,word.length-1);
+	      couldBePunct = word.substr(word.length, word.length-1);
 
 	  // if we've encountered a punct!
 	  if (_.indexOf(punct, couldBePunct) != -1){
 	    if (sentence.length + word.length+1 < 100){
-	      sentence += ' '+word;
+	      sentence += ' ' + word;
 	      toSay.push(sentence.trim());
 	    }else{
 	      toSay.push(sentence.trim());
@@ -230,10 +276,10 @@ Nationen.prototype._splitCommentInGoogleTTSFriendlyBites = function(comment){
 	    sentence = '';
 	  }else{
 	    if (sentence.length + word.length+1 < 100){
-	      sentence += ' '+word;
+	      sentence += ' ' + word;
 	    }else{
 	      toSay.push(sentence.trim());
-	      sentence = word;
+	      sentence = ' ' + word;
 	    }
 	  }
 	}
@@ -271,7 +317,7 @@ Nationen.prototype._converCommentsToAudio = function(commentObj, googleFriendlyC
 	    conversionQueue = conversionQueue - 1;
 
 	    if (conversionQueue == 0){
-	      me.events.emit('tts:done:' + commentObj.id);
+	      me.events.emit('tts:done:' + commentObj.id, commentObj);
 	    }
 	  });
 	}

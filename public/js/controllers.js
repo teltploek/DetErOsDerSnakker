@@ -2,6 +2,12 @@
 
 /* Controllers */
 
+app.filter('reverse', function() {
+  return function(items) {
+    return items.slice().reverse();
+  };
+});
+
 function AppCtrl($scope, socket) {
   $scope.begun = false;
 
@@ -18,6 +24,8 @@ function AppCtrl($scope, socket) {
   $scope.comments = [];
 
   socket.on('post:fetched', function (allCommentsArr) {
+    // console.log(allCommentsArr); - use this to debug issue where comments are sent to frontend twice
+
     $scope.comments = allCommentsArr;
 
     $scope.messages.push({ text : 'All comments for article received by front-end - getting ready to play...' });   
@@ -25,13 +33,14 @@ function AppCtrl($scope, socket) {
     setTimeout(function(){
       $('.progress-modal').modal('hide');
       initializeComment(0);
-    }, 1500)
+    }, 1000);
   });
 
   socket.on('new:status', function(statusMsg){
     $scope.messages.push({ text : statusMsg });
   });
 
+  // this event will handle all progress indication to the client - including the conversion progress
   socket.on('progress:update', function(status){
     if ($scope.progress == 0){
       $('.progress-modal').modal('show');
@@ -47,7 +56,7 @@ function AppCtrl($scope, socket) {
         });
 
         if (status - $scope.numberOfComments == 0){
-          $('.progress-modal').removeClass('active');
+          $('.progress-modal .progress').removeClass('active');
         }
     }, 1);
   });
@@ -74,7 +83,9 @@ function AppCtrl($scope, socket) {
     var comments = $scope.comments;
 
     if (!comments[commentIdx]){
-      $scope.begun = false;
+      $scope.$apply(function () {
+        $scope.begun = false;
+      });
 
       return;
     }
@@ -107,6 +118,18 @@ function AppCtrl($scope, socket) {
   };
 
   $scope.pushButton = function () {
+    $scope.articleData = {};
+    $scope.numberOfComments = 0;
+
+    $scope.progress = 0;
+    $scope.progressText = '';
+
+    $scope.commentsHtml = [];
+    $scope.commentVisible = false;
+
+    $scope.messages = [];
+    $scope.comments = [];
+
     $scope.begun = true;
   	
     socket.emit('app:begin');

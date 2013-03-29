@@ -1,7 +1,20 @@
 @import "compass_twitter_bootstrap";
 
+/* 
+  Allow angular.js to be loaded in body, hiding cloaked elements until 
+  templates compile.  The !important is important given that there may be 
+  other selectors that are more specific or come later and might alter display.  
+ */
+[ng\:cloak], [ng-cloak], .ng-cloak {
+  display: none !important;
+}
+
 .foo{
 	font-size:22px;
+}
+
+.button-wrapper{
+	text-align: center;
 }
 
 .console{
@@ -19,4 +32,22 @@
 .progress-wrapper{
 	margin:0 auto;
 	width:80%;
+}
+
+.comment-wrapper{
+	position:relative;
+
+	> div{
+		max-width:90%;
+	}
+
+	.rating{
+		position:absolute;
+		right:20px;
+		bottom:20px;
+
+		font-size:18px;
+		color:#555;
+		font-weight: bold;
+	}
 }
