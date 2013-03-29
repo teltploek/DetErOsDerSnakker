@@ -44,7 +44,11 @@ function AppCtrl($scope, socket) {
         $scope.$apply(function () {
           $scope.progress = newProgress;
           $scope.progressText = newProgressText;
-          });
+        });
+
+        if (status - $scope.numberOfComments == 0){
+          $('.progress-modal').removeClass('active');
+        }
     }, 1);
   });
 

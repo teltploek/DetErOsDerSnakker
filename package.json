@@ -3,7 +3,8 @@
     "version": "0.0.7",
     "author": {
         "name": "Brian Frisch",
-        "email": "brian@frisch.io"
+        "email": "brian@frisch.io",
+        "github" : "https://github.com/teltploek/DetErOsDerSnakker"
     },
     "private": false,
     "dependencies": {
@@ -15,8 +16,7 @@
         "bufferlist": "*",
         "strutil": "*",
         "underscore": "*",
-        "winston": "*",
-        "node-uuid": "*"
+        "winston": "*"
     },
     "devDependencies": {
         "grunt": "*",

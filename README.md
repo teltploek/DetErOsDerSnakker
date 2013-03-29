@@ -54,6 +54,7 @@ Major break-through! Managed to translate stringified unicode characters from co
   * Handle errors, eb downtime etc.
   * Make ps1-script more generic using relative dirs
   * Put current version in footer of page (read package.json and render in frontend)
+  * Google Analytics
 
 ---
 Wasting time since 1981
