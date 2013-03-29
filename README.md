@@ -49,6 +49,7 @@ Major break-through! Managed to translate stringified unicode characters from co
  * ~~Slicing up strings in 100 character bulks, sending to Google TTS and stiching up again afterwards~~ Done!!
 
 ## TODOs
+
  ## Must haves
   * Find a way to skip the narrating of web-addresses, smileys etc.
   * Handle errors, eb downtime etc.
