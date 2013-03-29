@@ -50,11 +50,8 @@ Major break-through! Managed to translate stringified unicode characters from co
 
 ## TODOs
 
- ## Must haves
   * Find a way to skip the narrating of web-addresses, smileys etc.
   * Handle errors, eb downtime etc.
-
- ## Nice to haves
   * Make ps1-script more generic using relative dirs
   * Put current version in footer of page (read package.json and render in frontend)
 
