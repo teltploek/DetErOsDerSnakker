@@ -139,7 +139,7 @@ Nationen.prototype._fetchComments = function(articleHtml, url){
 	var me = this,
 		articleID = this._parseArticleID(url);
 
-	articleID = '1945143';
+	// articleID = '1945143'; - nice little article for debugging...
 
 	var commentsUrl = 'http://orange.ekstrabladet.dk/comments/get.json?disable_new_comments=false&target=comments&comments_expand=true&notification=comment&id='+articleID+'&client_width=610&max_level=100&context=default';
 
