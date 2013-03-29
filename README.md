@@ -2,8 +2,6 @@
 
 Will fetch comments from Ekstra Bladets nationen, and read them out loud. In other words: A multi-billion $ project in the making.
 
-[![ScreenShot](https://raw.github.com/teltploek/DetErOsDerSnakker/tree/master/ressources/youtubeScreenshot.png)](http://youtu.be/vt5fpE0bzSY)
-
 ## Why?
 
 Well for one; it's fun! Every person I've mentioned this for has initially laughed, and then shown interest in the project.
@@ -32,6 +30,10 @@ Right now everything is work in progress, so don't expect anything to work yet.
 
 ## Updates
 
+March 28-29
+
+Working on rewriting Nationen module, so it'll have a dedicated socket-room per client - previously socket communication were mixed and matched across connected clients. This is probably solved now, but needs more testing...
+
 March 23
 
 Putting things together - it's starting to look promising...
@@ -42,14 +44,18 @@ Major break-through! Managed to translate stringified unicode characters from co
 
 ## Working on...
 
+ * ~~Getting socket to communicate with the user per request rather than globally across all connections~~ Probably done... needs more testing.
  * ~~Getting weird unicode from comment feed translated to readable characters~~ Done!!
  * ~~Slicing up strings in 100 character bulks, sending to Google TTS and stiching up again afterwards~~ Done!!
- * Mocking up the frontend - mostly in my head right now, but should be prototyped somehow
 
 ## TODOs
+	## Must haves
+ 		* Find a way to skip the narrating of web-addresses, smileys etc.
+ 		* Handle errors, eb downtime etc.
 
- * Find a way to skip the narrating of web-addresses, smileys etc.
- * Make ps1-script more generic using relative dirs
+ 	## Nice to haves
+		* Make ps1-script more generic using relative dirs
+ 		* Put current version in footer of page (read package.json and render in frontend)
 
 ---
 Wasting time since 1981

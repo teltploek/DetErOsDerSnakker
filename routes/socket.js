@@ -20,31 +20,19 @@ var logger = function(filename){
 var applicationLogger = logger('app'),
     errorLogger = logger('error');
 
-var nationen = (function () {
+var Nationen = function () {
 
-  var events = new eventEmitter
-      socket = null,
+  var events = new eventEmitter,
+      io = null
+      roomID = '',
       comments = [];
 
-  // we need a couple of hardcoded messages in the system, that we need to pass along to Google TTS as well
-  var narration = {
-    cycle: {
-      answer : 'Svar til foregående kommentar'
-    },
-    author : {
-      by : 'Kommentar af indsendt af',
-      when : 'den '
-    },
-    rating: {
-      '+' : 'Plus',
-      '-' : 'Minus'
-    }
-  };
-
-  var init = function(mainSocket){
+  var init = function(mainIO, mainroomID){
     comments = [];
     
-    socket = mainSocket; // setting global socket for nationen scope
+    io = mainIO;
+
+    roomID = mainroomID;
 
     retrieveFrontPage(); // unveil madness!
   };
@@ -54,13 +42,13 @@ var nationen = (function () {
       if (error) return errorLogger.log('error', error);
 
       successMediator(body, function(comments){
-        socket.emit('message:incoming', comments);
+        io.sockets.in(roomID).emit('message:incoming', comments);
       });
     });
   }
 
   var successMediator = function (body, callback){
-    socket.emit('new:status', 'ekstrabladet.dk fetched!');
+    io.sockets.in(roomID).emit('new:status', 'ekstrabladet.dk fetched!');
 
     // FIXME: We might not need this - we need to make it event based due to asyncronous nature of Google TTS call... think it through, matey
     events.on('comments:fetched', function(){
@@ -71,7 +59,7 @@ var nationen = (function () {
   };
 
   var findArticle = function(body){
-    socket.emit('new:status', 'Fetching random article...');
+    io.sockets.in(roomID).emit('new:status', 'Fetching random article...');
 
     var $ = cheerio.load(body);
 
@@ -93,7 +81,7 @@ var nationen = (function () {
     request(url, function(error, response, body){
       if (error) return errorLogger.log('error', error);
 
-      socket.emit('new:status', 'Random article found:');     
+      io.sockets.in(roomID).emit('new:status', 'Random article found:');     
 
       var $ = cheerio.load(body);
 
@@ -102,9 +90,9 @@ var nationen = (function () {
         href  : url
       }
 
-      socket.emit('new:status', '' + articleData.title + ' - ' + articleData.href);
+      io.sockets.in(roomID).emit('new:status', '' + articleData.title + ' - ' + articleData.href);
 
-      socket.emit('article:found', articleData);
+      io.sockets.in(roomID).emit('article:found', articleData);
 
       fetchComments($, url);
     });
@@ -119,7 +107,7 @@ var nationen = (function () {
 
     var commentsUrl = 'http://orange.ekstrabladet.dk/comments/get.json?disable_new_comments=false&target=comments&comments_expand=true&notification=comment&id='+articleID+'&client_width=610&max_level=100&context=default';
    
-    socket.emit('new:status', 'Fetching nationen comments...');
+    io.sockets.in(roomID).emit('new:status', 'Fetching nationen comments...');
 
     request(commentsUrl, function(error, response, body){
       if (error) return errorLogger.log('error', error);
@@ -137,11 +125,11 @@ var nationen = (function () {
     var commentObj = $('li.comment');
 
     if (commentObj.length){
-      socket.emit('article:comments', commentObj.length);
+      io.sockets.in(roomID).emit('article:comments', commentObj.length);
 
       retrieveComments(content);
     }else{
-      socket.emit('new:status', 'No comments for this article - finding new article...');
+      io.sockets.in(roomID).emit('new:status', 'No comments for this article - finding new article...');
       retrieveFrontPage();
     }
   };
@@ -150,7 +138,7 @@ var nationen = (function () {
     var $ = cheerio.load(content),
         i = 0;
     
-    socket.emit('new:status', 'Comments found - retrieving comments...');
+    io.sockets.in(roomID).emit('new:status', 'Comments found - retrieving comments...');
 
     $('li.comment').each(function(){
       i++;
@@ -181,7 +169,7 @@ var nationen = (function () {
       comments.push(comment);
     });   
 
-    socket.emit('new:status', 'All comments retrieved. Running them by Google TTS...');
+    io.sockets.in(roomID).emit('new:status', 'All comments retrieved. Running them by Google TTS...');
 
     distributeSoundBites();
   };
@@ -203,10 +191,10 @@ var nationen = (function () {
 
         allCommentQueue = allCommentQueue - 1;
 
-        socket.emit('progress:update', allCommentQueue);
+        io.sockets.in(roomID).emit('progress:update', allCommentQueue);
 
         if (allCommentQueue == 0){
-          socket.emit('post:fetched', comments);
+          io.sockets.in(roomID).emit('post:fetched', comments);
         }
       });
     }
@@ -321,13 +309,16 @@ var nationen = (function () {
   return {
     init: init
   };
-}());
+}
 
 // export function for listening to the socket
-module.exports = function (socket) {	
-	socket.on('app:begin', function (data) {
-    socket.emit('new:status', 'Fetching ekstrabladet.dk...');
+module.exports = function (io, socket, roomID) {	
+	// socket.on('app:begin', function (data) {
+  socket.on('app:begin', function (data) {
+    io.sockets.in(roomID).emit('new:status', 'Fetching ekstrabladet.dk...');
 
-    nationen.init(socket);
+    var nation = new Nationen();
+
+    nation.init(io, roomID);
 	});
 };

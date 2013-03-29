@@ -6,8 +6,8 @@
 var express = require('express'),
   cp = require('child_process'), // used for grunt 
   routes = require('./routes'),
-  socket = require('./routes/socket.js');
-
+  Nationen = require('./routes/nationen.js'),
+  uuid = require('node-uuid');
 
   // setup grunt as a child process
 var grunt = cp.spawn('grunt.cmd', ['default', 'watch']);
@@ -48,11 +48,20 @@ app.configure('production', function(){
 // Routes
 app.get('/', routes.index);
 
-// redirect all others to the index (HTML5 history)
-app.get('*', routes.error);
+var N = {}; // to hold all Nationen room instances
 
 // Socket.io Communication
-io.sockets.on('connection', socket);
+io.sockets.on('connection', function(socket){
+  var roomID = uuid.v1();
+
+  socket.join(roomID); // separate clients - FIMXE: we might actually be able to drop node-uuid and use socket.id - try that out!
+
+  N[roomID] = new Nationen(io, socket, roomID);
+
+  socket.on('app:begin', function(){
+    N[roomID]._retrieveFrontPage();
+  });
+})
 
 // Start server
 server.listen(3000, function(){

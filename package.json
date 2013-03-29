@@ -1,6 +1,6 @@
 {
     "name": "DetErOsDerSnakker",
-    "version": "0.0.6",
+    "version": "0.0.7",
     "author": {
         "name": "Brian Frisch",
         "email": "brian@frisch.io"
@@ -15,7 +15,8 @@
         "bufferlist": "*",
         "strutil": "*",
         "underscore": "*",
-        "winston": "*"
+        "winston": "*",
+        "node-uuid": "*"
     },
     "devDependencies": {
         "grunt": "*",
