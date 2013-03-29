@@ -49,13 +49,13 @@ Major break-through! Managed to translate stringified unicode characters from co
  * ~~Slicing up strings in 100 character bulks, sending to Google TTS and stiching up again afterwards~~ Done!!
 
 ## TODOs
-	## Must haves
- 		* Find a way to skip the narrating of web-addresses, smileys etc.
- 		* Handle errors, eb downtime etc.
+ ## Must haves
+  * Find a way to skip the narrating of web-addresses, smileys etc.
+  * Handle errors, eb downtime etc.
 
- 	## Nice to haves
-		* Make ps1-script more generic using relative dirs
- 		* Put current version in footer of page (read package.json and render in frontend)
+ ## Nice to haves
+  * Make ps1-script more generic using relative dirs
+  * Put current version in footer of page (read package.json and render in frontend)
 
 ---
 Wasting time since 1981
