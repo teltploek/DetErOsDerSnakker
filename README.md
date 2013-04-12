@@ -1,8 +1,6 @@
-# Det Er Os Der Snakker
+# Det Er Os Der Snakker [![Nodejitsu Deploy Status Badges](https://webhooks.nodejitsu.com/teltploek/DetErOsDerSnakker.png)](https://webops.nodejitsu.com#teltploek/webhooks)
 
 Will fetch comments from Ekstra Bladets nationen, and read them out loud. In other words: A multi-billion $ project in the making.
-
-[![Nodejitsu Deploy Status Badges](https://webhooks.nodejitsu.com/teltploek/DetErOsDerSnakker.png)](https://webops.nodejitsu.com#teltploek/webhooks)
 
 ## Why?
 
