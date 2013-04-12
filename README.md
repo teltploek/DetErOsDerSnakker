@@ -30,6 +30,10 @@ Right now everything is work in progress, so don't expect anything to work yet.
 
 ## Updates
 
+April 12
+
+Redid the Nationen module a couple of weeks ago. Beginning to implement nicer layout.
+
 March 28-29
 
 Working on rewriting Nationen module, so it'll have a dedicated socket-room per client - previously socket communication were mixed and matched across connected clients. This is probably solved now, but needs more testing...
@@ -44,6 +48,7 @@ Major break-through! Managed to translate stringified unicode characters from co
 
 ## Working on...
 
+ * Cleaning up after article narration so we're able to read out the next one. Right now comments are mixed and matched.
  * ~~Getting socket to communicate with the user per request rather than globally across all connections~~ Probably done... needs more testing.
  * ~~Getting weird unicode from comment feed translated to readable characters~~ Done!!
  * ~~Slicing up strings in 100 character bulks, sending to Google TTS and stiching up again afterwards~~ Done!!

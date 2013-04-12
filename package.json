@@ -1,10 +1,10 @@
 {
     "name": "DetErOsDerSnakker",
-    "version": "0.0.7",
+    "version": "0.0.7-1",
     "author": {
         "name": "Brian Frisch",
         "email": "brian@frisch.io",
-        "github" : "https://github.com/teltploek/DetErOsDerSnakker"
+        "github": "https://github.com/teltploek/DetErOsDerSnakker"
     },
     "private": false,
     "dependencies": {

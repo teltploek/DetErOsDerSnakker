@@ -51,7 +51,7 @@ app.configure('production', function(){
 app.get('/', routes.index);
 
 // redirect all others to the index (HTML5 history)
-app.get('*', routes.index);
+// app.get('*', routes.index);
 
 // Socket.io Communication
 io.sockets.on('connection', function(socket){

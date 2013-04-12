@@ -1,4 +1,7 @@
 @import "compass_twitter_bootstrap";
+@import "_buttons";
+
+@import url(https://fonts.googleapis.com/css?family=Open+Sans:400,700|Montserrat:400,700);
 
 /* 
   Allow angular.js to be loaded in body, hiding cloaked elements until 
@@ -9,8 +12,27 @@
   display: none !important;
 }
 
-.foo{
-	font-size:22px;
+body{
+	background:transparent url(/images/bg.png);
+	font-family: "Open Sans","Helvetica Neue",Helvetica,Arial,sans-serif;
+}
+
+.hero-unit{
+	background-color: transparent;
+	margin-bottom:0;
+
+	p{
+		margin:0 auto;
+		width:170px;
+		font-weight: bold;
+	}
+}
+
+.logo{
+	background:transparent url(/images/logo.png) no-repeat;
+	width:774px;
+	height:251px;
+	margin:0 auto;
 }
 
 .button-wrapper{

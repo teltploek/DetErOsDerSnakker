@@ -1,13 +1,6 @@
 'use strict';
 
 /* Controllers */
-
-app.filter('reverse', function() {
-  return function(items) {
-    return items.slice().reverse();
-  };
-});
-
 function AppCtrl($scope, socket) {
   $scope.begun = false;
 
@@ -24,8 +17,8 @@ function AppCtrl($scope, socket) {
   $scope.comments = [];
 
   socket.on('post:fetched', function (allCommentsArr) {
-    // console.log(allCommentsArr); - use this to debug issue where comments are sent to frontend twice
-
+    console.log(allCommentsArr);
+    
     $scope.comments = allCommentsArr;
 
     $scope.messages.push({ text : 'All comments for article received by front-end - getting ready to play...' });   

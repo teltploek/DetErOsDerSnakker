@@ -131,9 +131,23 @@ Nationen.prototype._fetchArticle = function(url){
 	});
 };
 
+/**
+ * Parsing the url to find the ID of the article
+ *
+ * @param {String} the url for an article
+ * @api private
+ */
+
 Nationen.prototype._parseArticleID = function(url){
 	return url.split('article')[1].split('.ece')[0];
 };
+
+/**
+ * Fetch comments from comment feed
+ *
+ * @param ...
+ * @api private
+ */
 
 Nationen.prototype._fetchComments = function(articleHtml, url){
 	var me = this,
@@ -234,7 +248,6 @@ Nationen.prototype._distributeSoundBites = function(){
 
 	    me.mainIO.sockets.in(me.roomID).emit('progress:update', allCommentQueue);
 
-	    // TODO: find out why the comments are returned twice
 	    if (allCommentQueue == 0){
 	      me.mainIO.sockets.in(me.roomID).emit('post:fetched', convertedComments);
 	    }

@@ -1,51 +1,52 @@
 extends layout
 
 block body
-  .container(ng-controller='AppCtrl')
-    .hero-unit
-      h1 DET ER OS DER SNAKKER
+  div(ng-controller='AppCtrl')
+    .container
+      .hero-unit
+        .logo
         p Nationen on roids!
-    .row
-      .span12(ng-show='!begun')
-        fieldset
-          .button-wrapper
-            form.unveil-madness(ng-submit='pushButton()')
-              input.btn-large.btn-primary(type='submit', value='UNVEIL MADNESS')
-      .span12(ng-cloak,ng-show='begun')
-        .row
-          .span8
-              legend
-                a(href='{{articleData.href}}', target='_blank') {{articleData.title}}
-              .pull-left {{numberOfComments}} kommentarer
+      .row
+        .span12(ng-show='!begun')
+          fieldset
+            .button-wrapper
+              form.unveil-madness(ng-submit='pushButton()')
+                input.button(type='submit', value='UNVEIL MADNESS')
+        .span12(ng-cloak,ng-show='begun')
+          .row
+            .span8
+                legend
+                  a(href='{{articleData.href}}', target='_blank') {{articleData.title}}
+                .pull-left {{numberOfComments}} kommentarer
 
-              .row(ng-repeat='comment in commentsHtml | reverse')
-                .span8
-                  .row
-                    .span8
-                      h5 {{comment.name}} - {{comment.date}}
-                  .row
-                    .span1
-                      img.polaroid(src='{{comment.avatarUrl}}')
-                    .span7.comment-wrapper
-                      div {{comment.bodyHTML}}
-                      .rating
-                        em
-                          {{comment.rating}}
-                .clearfix
-                hr
-          .span4
-            legend Status           
-            .well.console
-              p(ng-repeat='message in messages') {{message.text}}
+                .row(ng-repeat='comment in commentsHtml | reverse')
+                  .span8
+                    .row
+                      .span8
+                        h5 {{comment.name}} - {{comment.date}}
+                    .row
+                      .span1
+                        img.polaroid(src='{{comment.avatarUrl}}')
+                      .span7.comment-wrapper
+                        div {{comment.bodyHTML}}
+                        .rating
+                          em
+                            {{comment.rating}}
+                  .clearfix
+                  hr
+            .span4
+              legend Status           
+              .well.console
+                p(ng-repeat='message in messages') {{message.text}}
 
-  .modal.hide.fade.progress-modal(ng-controller='AppCtrl')
-    .modal-header
-      h3 Wait for it...
-    .modal-body
-      p Converting {{numberOfComments}} comments to sound.
+    .modal.hide.fade.progress-modal
+      .modal-header
+        h3 Wait for it...
+      .modal-body
+        p Converting {{numberOfComments}} comments to sound.
 
-      p This might take a little while.
+        p This might take a little while.
 
-      .progress-wrapper(style='width:80%;margin:0 auto;')
-        .progress.progress-striped.active
-          .bar(style='width: {{progress}}%;') {{progressText}}
+        .progress-wrapper(style='width:80%;margin:0 auto;')
+          .progress.progress-striped.active
+            .bar(style='width: {{progress}}%;') {{progressText}}
