@@ -2,6 +2,8 @@
 
 Will fetch comments from Ekstra Bladets nationen, and read them out loud. In other words: A multi-billion $ project in the making.
 
+[![Nodejitsu Deploy Status Badges](https://webhooks.nodejitsu.com/teltploek/DetErOsDerSnakker.png)](https://webops.nodejitsu.com#nodejitsu/webhooks)
+
 ## Why?
 
 Well for one; it's fun! Every person I've mentioned this for has initially laughed, and then shown interest in the project.
