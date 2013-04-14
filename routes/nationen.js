@@ -155,7 +155,7 @@ Nationen.prototype._fetchComments = function(articleHtml, url){
 	var me = this,
 		articleID = this._parseArticleID(url);
 
-	articleID = '1945143';
+	// articleID = '1945143';
 	// articleID = '1952083';
 	// article that crashes the app - find out why!
 	// articleID = '1953606';
