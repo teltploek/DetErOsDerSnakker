@@ -35,8 +35,25 @@ body{
 	margin:0 auto;
 }
 
+a{
+	color:#000;
+}
+legend{
+	border-color: #aaa;
+}
+
 .button-wrapper{
 	text-align: center;
+}
+
+.comments{
+	height:400px;
+	max-height: 400px;
+	overflow:hidden;
+
+	h5{
+		display:inline-block;
+	}
 }
 
 .console{
@@ -56,20 +73,29 @@ body{
 	width:80%;
 }
 
-.comment-wrapper{
-	position:relative;
+.img-wrapper{
+	background:transparent url(/images/picture.png) no-repeat;
+	width:79px;
+	height:79px;
 
-	> div{
-		max-width:90%;
+	img{
+		margin-top:7px;
+		margin-left:7px;
+		width:60px;
+		height:60px;
 	}
+}
 
-	.rating{
-		position:absolute;
-		right:20px;
-		bottom:20px;
 
-		font-size:18px;
-		color:#555;
-		font-weight: bold;
+.rating{
+	color:#555;
+	font-weight: bold;
+	margin-left:10px;
+	font-size:16px;
+}
+
+.comment-wrapper{
+	> div{
+		margin-left:20px;
 	}
 }

@@ -16,9 +16,7 @@ function AppCtrl($scope, socket) {
   $scope.messages = [];
   $scope.comments = [];
 
-  socket.on('post:fetched', function (allCommentsArr) {
-    console.log(allCommentsArr);
-    
+  socket.on('post:fetched', function (allCommentsArr) {    
     $scope.comments = allCommentsArr;
 
     $scope.messages.push({ text : 'All comments for article received by front-end - getting ready to play...' });   

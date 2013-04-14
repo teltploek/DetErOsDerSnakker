@@ -50,6 +50,8 @@ function Nationen(mainIO, mainSocket, roomID) {
 Nationen.prototype.retrieveFrontPage = function(){
 	var me = this;
 
+	this.comments = [];
+
 	request('http://ekstrabladet.dk/', function(error, response, body) {
 	  // if (error) return errorLogger.log('error', error);
 	
@@ -153,7 +155,10 @@ Nationen.prototype._fetchComments = function(articleHtml, url){
 	var me = this,
 		articleID = this._parseArticleID(url);
 
-	// articleID = '1945143'; - nice little article for debugging...
+	articleID = '1945143';
+	// articleID = '1952083';
+	// article that crashes the app - find out why!
+	// articleID = '1953606';
 
 	var commentsUrl = 'http://orange.ekstrabladet.dk/comments/get.json?disable_new_comments=false&target=comments&comments_expand=true&notification=comment&id='+articleID+'&client_width=610&max_level=100&context=default';
 
@@ -200,9 +205,7 @@ Nationen.prototype._retrieveComments = function(content){
         body : '',
         bodyHTML : '',
         rating : $(this).find('.comment-inner').first().find('.rating-buttons .rating').text(),
-        bodySoundbites : [], // this array will hold all the base64 encoded sound bites for an entire comment
-        bodySoundbitesIdx : [],
-        bodySoundbitesText: []
+        bodySoundbites : [] // this array will hold all the base64 encoded sound bites for an entire comment
       };
 
       $(this).find('.comment-inner').first().find('.body p').each(function(i, elem){
@@ -211,8 +214,10 @@ Nationen.prototype._retrieveComments = function(content){
   
       // there are stringified unicode characters in the comment feed - we need to JSON.parse them to get readable characters
       var parseSource = "{ \"comment\" : \""+ comment.body +"\" }";
+      var parsedName = JSON.parse("{ \"name\" : \""+ comment.name +"\" }");
       var parsedComment = JSON.parse(parseSource);
 
+      comment.name = parsedName.name;
       comment.body = parsedComment.comment;
       comment.bodyHTML = comment.body;
 
@@ -237,7 +242,6 @@ Nationen.prototype._distributeSoundBites = function(){
 	  var commentObj = this.comments[i];
 
 	  var googleTTSFriendlyComment = this._splitCommentInGoogleTTSFriendlyBites(commentObj.body); // we need to split comment in to bulks of 100 characters
-	  commentObj.bodySoundbitesText = googleTTSFriendlyComment;
 
 	  this._converCommentsToAudio(commentObj, googleTTSFriendlyComment);
 
@@ -258,6 +262,12 @@ Nationen.prototype._distributeSoundBites = function(){
 Nationen.prototype._splitCommentInGoogleTTSFriendlyBites = function(comment){
 	var toSay = [],
 	    punct = [',',':',';','.','?','!'];
+
+	// we don't want more than one punct in a row
+	comment = comment.replace(/\.\.+/g, '.');
+
+	// we don't want to read out web addresses
+	comment = comment.replace(/(ftp|http|https):\/\/(\w+:{0,1}\w*@)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%@!\-\/]))?/g, 'web-adresse');
 
 	// put space after each an every punct sign
     _.each(punct, function(val){
@@ -321,7 +331,7 @@ Nationen.prototype._converCommentsToAudio = function(commentObj, googleFriendlyC
 
 	    // FIXME: Major hack to have soundbites arranged in correct order:
 	    //        We're passing along the original index in the uri. When the call returns we parse out the uri query in the response to refetch our index
-	    // ... we need to rethink this - but right now, we want it working.
+	    // 		  ... we need to rethink this - but right now, we want it working.
 	    // "First do it, then do it right, then do it better" - quote: Addy Osmani
 	    var soundBiteIdx = response.request.uri.query.split('&')[0].split('=')[1];
 

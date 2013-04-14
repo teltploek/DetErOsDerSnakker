@@ -1,7 +1,7 @@
 extends layout
 
 block body
-  div(ng-controller='AppCtrl')
+  div(ng-controller='AppCtrl', data-ng-class="{animations: animationsEnabled}")
     .container
       .hero-unit
         .logo
@@ -14,30 +14,26 @@ block body
                 input.button(type='submit', value='UNVEIL MADNESS')
         .span12(ng-cloak,ng-show='begun')
           .row
-            .span8
+            .comments.span8.offset2
                 legend
                   a(href='{{articleData.href}}', target='_blank') {{articleData.title}}
                 .pull-left {{numberOfComments}} kommentarer
 
-                .row(ng-repeat='comment in commentsHtml | reverse')
+                .row(data-ng-hide="hidden", data-ng-animate="'fade'", ng-repeat='comment in commentsHtml | reverse')
                   .span8
                     .row
                       .span8
-                        h5 {{comment.name}} - {{comment.date}}
+                        h5 {{comment.name}} - {{comment.date}} 
+                        span.rating
+                          {{comment.rating}}
                     .row
                       .span1
-                        img.polaroid(src='{{comment.avatarUrl}}')
-                      .span7.comment-wrapper
+                        .img-wrapper
+                          img(src='{{comment.avatarUrl}}')
+                      .span6.comment-wrapper
                         div {{comment.bodyHTML}}
-                        .rating
-                          em
-                            {{comment.rating}}
                   .clearfix
                   hr
-            .span4
-              legend Status           
-              .well.console
-                p(ng-repeat='message in messages') {{message.text}}
 
     .modal.hide.fade.progress-modal
       .modal-header
