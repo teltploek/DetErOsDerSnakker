@@ -158,7 +158,7 @@ Nationen.prototype._fetchComments = function(articleHtml, url){
 	// articleID = '1945143';
 	// articleID = '1952083';
 	// article that crashes the app - find out why!
-	articleID = '1953606';
+	// articleID = '1953606';
 
 	var commentsUrl = 'http://orange.ekstrabladet.dk/comments/get.json?disable_new_comments=false&target=comments&comments_expand=true&notification=comment&id='+articleID+'&client_width=610&max_level=100&context=default';
 
