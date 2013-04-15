@@ -187,8 +187,8 @@ Nationen.prototype._parseArticleID = function(url){
 Nationen.prototype._lookForStoredArticle = function(articleHtml, url){
 	var me = this;
 
-	this.articleID = '1945143';
-	// this.articleID = this._parseArticleID(url);
+	// this.articleID = '1945143';
+	this.articleID = this._parseArticleID(url);
 
 
 	Article.find({ articleID : me.articleID }, function(err, results){
