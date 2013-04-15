@@ -18,7 +18,7 @@ If you really need to, you could try to clone it, then run
 
       npm install 
 
-(I guess it goes without saying that Node.js is a dependency for running this.)
+(I guess it goes without saying that Node.js is a dependency for running this. You also need to have a local MongoDB instance running on your system)
 
 When you've done npm install then run
 
@@ -30,6 +30,7 @@ Right now everything is work in progress, so don't expect anything to work yet.
 
 ## Working on...
 
+ * Store previously converted articles in MongoDB database so we don't strain Google TTS service.
  * ~~Getting socket to communicate with the user per request rather than globally across all connections~~ Probably done... needs more testing.
  * ~~Getting weird unicode from comment feed translated to readable characters~~ Done!!
  * ~~Slicing up strings in 100 character bulks, sending to Google TTS and stiching up again afterwards~~ Done!!

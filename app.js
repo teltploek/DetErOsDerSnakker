@@ -40,10 +40,13 @@ app.configure(function(){
 });
 
 app.configure('development', function(){
+  process.env.DBSTR = 'mongodb://localhost/DetErOsDerSnakker';
+  
   app.use(express.errorHandler({ dumpExceptions: true, showStack: true }));
 });
 
 app.configure('production', function(){
+  app.set('dbString', process.env.DBSTR);
   app.use(express.errorHandler());
 });
 
@@ -62,7 +65,7 @@ io.sockets.on('connection', function(socket){
   var N = new Nationen(io, socket, roomID);
 
   socket.on('app:begin', function(){
-    N.retrieveFrontPage();
+    N.beginAfterDbConnection(process.env.DBSTR);
   });
 });
 

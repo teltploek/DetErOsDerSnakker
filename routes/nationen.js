@@ -14,7 +14,25 @@ var request = require('request'),
     eventEmitter = require('events').EventEmitter,
     strutil = require('strutil'),
     _ = require('underscore'),
-    winston = require('winston');
+    winston = require('winston'),
+    mongoose = require('mongoose');
+
+var articleSchema = mongoose.Schema({
+	articleID : String,
+	comments : [{
+		id : Number,
+		avatarUrl : String,
+		name : String,
+		date : String,
+		body : String,
+		bodyHTML : String,
+		rating : String,
+		bodySoundbites : Array
+	}],
+	count: Number
+});
+
+var Article = mongoose.model('Article', articleSchema);
 
 /**
  * Export the constructor.
@@ -38,7 +56,28 @@ function Nationen(mainIO, mainSocket, roomID) {
   this.mainIO = mainIO;
 
   this.events = new eventEmitter;
+  this.articleID = '';
   this.comments = [];
+
+  this.isDbConnected = false;
+};
+
+Nationen.prototype.beginAfterDbConnection = function(dbConnectionString){
+	var me = this;
+
+	if (!this.isDbConnected){
+		mongoose.connect(dbConnectionString);
+
+	  	this.db = mongoose.connection;
+
+		this.db.once('open', function(){
+			me.isDbConnected = true;
+
+			me.retrieveFrontPage();
+		});
+	}else{
+		this.retrieveFrontPage();
+	}
 };
 
 /**
@@ -129,7 +168,7 @@ Nationen.prototype._fetchArticle = function(url){
 
 		me.mainIO.sockets.in(me.roomID).emit('article:found', articleData);
 
-		me._fetchComments($, url);
+		me._lookForStoredArticle($, url);
 	});
 };
 
@@ -144,6 +183,29 @@ Nationen.prototype._parseArticleID = function(url){
 	return url.split('article')[1].split('.ece')[0];
 };
 
+
+Nationen.prototype._lookForStoredArticle = function(articleHtml, url){
+	var me = this;
+
+	this.articleID = '1945143';
+	// this.articleID = this._parseArticleID(url);
+
+
+	Article.find({ articleID : me.articleID }, function(err, results){
+		try{
+			if (results && results.length){
+				var result = results[0];
+
+				me.mainIO.sockets.in(me.roomID).emit('post:fetched', result.comments);
+			}else{
+				me._fetchComments(me.articleID, articleHtml);
+			}
+		}catch(e){
+			console.log(e);
+		}
+	})
+};
+
 /**
  * Fetch comments from comment feed
  *
@@ -151,14 +213,8 @@ Nationen.prototype._parseArticleID = function(url){
  * @api private
  */
 
-Nationen.prototype._fetchComments = function(articleHtml, url){
-	var me = this,
-		articleID = this._parseArticleID(url);
-
-	// articleID = '1945143';
-	// articleID = '1952083';
-	// article that crashes the app - find out why!
-	// articleID = '1953606';
+Nationen.prototype._fetchComments = function(articleID, articleHtml){
+	var me = this;
 
 	var commentsUrl = 'http://orange.ekstrabladet.dk/comments/get.json?disable_new_comments=false&target=comments&comments_expand=true&notification=comment&id='+articleID+'&client_width=610&max_level=100&context=default';
 
@@ -236,7 +292,8 @@ Nationen.prototype._distributeSoundBites = function(){
 		length = this.comments.length,
 	    allCommentQueue = length,
 	    i,
-	    convertedComments = [];
+	    convertedComments = [],
+	    article;
 
 	for (i = 0; i < length; ++i) {
 	  var commentObj = this.comments[i];
@@ -253,8 +310,16 @@ Nationen.prototype._distributeSoundBites = function(){
 	    me.mainIO.sockets.in(me.roomID).emit('progress:update', allCommentQueue);
 
 	    if (allCommentQueue == 0){
-	      me.mainIO.sockets.in(me.roomID).emit('post:fetched', convertedComments);
-	    }
+	    	article = new Article({
+	    		articleID : me.articleID,
+	    		comments: convertedComments
+	    	});
+
+	    	article.save(function(){
+	    		me.mainIO.sockets.in(me.roomID).emit('post:fetched', convertedComments);
+	    	})
+
+	      }
 	  });
 	}
 };
