@@ -158,7 +158,7 @@ Nationen.prototype._fetchComments = function(articleHtml, url){
 	// articleID = '1945143';
 	// articleID = '1952083';
 	// article that crashes the app - find out why!
-	// articleID = '1953606';
+	articleID = '1953606';
 
 	var commentsUrl = 'http://orange.ekstrabladet.dk/comments/get.json?disable_new_comments=false&target=comments&comments_expand=true&notification=comment&id='+articleID+'&client_width=610&max_level=100&context=default';
 
@@ -352,7 +352,14 @@ Nationen.prototype._googleTextToSpeech = function(url, callback){
 
 Nationen.prototype._convertTTSResponseToBase64 = function(response, body){
 	var data_uri_prefix = 'data:' + response.headers['content-type'] + ';base64,';
-    var comment64 = new Buffer(body.toString(), 'binary').toString('base64');
+
+	// try to handle response, or fail gracefully...
+	try{
+    	var comment64 = new Buffer(body.toString(), 'binary').toString('base64');
+	}
+	catch(e){ // ...by adding empty sound to base64 string
+		var comment64 = '/+MYxAAAAANIAUAAAASEEB/jwOFM/0MM/90b/+RhST//w4NFwOjf///PZu////9lns5GFDv//l9GlUIEEIAAAgIg8Ir/JGq3/+MYxDsLIj5QMYcoAP0dv9HIjUcH//yYSg';
+	}
 
 	return data_uri_prefix + comment64;
 };

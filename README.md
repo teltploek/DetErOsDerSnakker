@@ -44,7 +44,7 @@ Right now everything is work in progress, so don't expect anything to work yet.
   * ~~Skip the narrating of web-addresses, smileys etc.~~ Done!!
   * ~~Cleaning up after article narration so we're able to read out the next one. Right now comments are mixed and matched.~~ Done !!
   * ~~Convert names to remove stringified unicode chars.~~ Done!!
-  * Some times the TTS conversion fails - find out why, and fix it.
+  * ~~Some times the TTS conversion fails - find out why, and fix it.~~ Done!!
   * ~~Max '...'-conversion.~~ Done!!
   * Handle errors, eb downtime etc.
   * Make ps1-script more generic using relative dirs
