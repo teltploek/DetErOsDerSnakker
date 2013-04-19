@@ -2,7 +2,7 @@
 
 /* Controllers */
 function AppCtrl($scope, socket) {
-  $scope.begun = false;
+  $scope.state = 'waiting';
 
   $scope.articleData = {};
   $scope.numberOfComments = 0;
@@ -14,6 +14,7 @@ function AppCtrl($scope, socket) {
   $scope.commentVisible = false;
 
   $scope.messages = [];
+  $scope.stateMessage = '';
   $scope.comments = [];
 
   socket.on('post:fetched', function (allCommentsArr) {    
@@ -22,19 +23,24 @@ function AppCtrl($scope, socket) {
     $scope.messages.push({ text : 'All comments for article received by front-end - getting ready to play...' });   
 
     setTimeout(function(){
-      $('.progress-modal').modal('hide');
+      $scope.state = 'reading';
+
+      $('.progress-wrapper').hide();
+
       initializeComment(0);
     }, 1000);
   });
 
   socket.on('new:status', function(statusMsg){
+    $scope.stateMessage = statusMsg;
+
     $scope.messages.push({ text : statusMsg });
   });
 
   // this event will handle all progress indication to the client - including the conversion progress
   socket.on('progress:update', function(status){
     if ($scope.progress == 0){
-      $('.progress-modal').modal('show');
+      $('.progress-wrapper').show();
     }
 
     var newProgress = ($scope.numberOfComments - status) / $scope.numberOfComments * 100,
@@ -121,7 +127,7 @@ function AppCtrl($scope, socket) {
     $scope.messages = [];
     $scope.comments = [];
 
-    $scope.begun = true;
+    $scope.state = 'preparing';
   	
     socket.emit('app:begin');
   };

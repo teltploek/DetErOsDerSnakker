@@ -17,6 +17,7 @@ var request = require('request'),
     winston = require('winston'),
     mongoose = require('mongoose');
 
+// TODO: I'm not entirely happy with this schema... redo it to be nicer and more clean cut (ex. bodySoundbites is a horrible prop name)
 var articleSchema = mongoose.Schema({
 	articleID : String,
 	comments : [{
@@ -61,6 +62,12 @@ function Nationen(mainIO, mainSocket, roomID) {
 
   this.isDbConnected = false;
 };
+
+/**
+ * Wait for db-connection and begin when ready
+ *
+ * @api public
+ */
 
 Nationen.prototype.beginAfterDbConnection = function(dbConnectionString){
 	var me = this;
@@ -183,6 +190,13 @@ Nationen.prototype._parseArticleID = function(url){
 	return url.split('article')[1].split('.ece')[0];
 };
 
+/**
+ * Find out if this article is stored in the database
+ *
+ * @param {Cheerio Object} The article HTML wrapped in Cheerio
+ * @param {String} the url for the article in question
+ * @api private
+ */
 
 Nationen.prototype._lookForStoredArticle = function(articleHtml, url){
 	var me = this;
@@ -209,7 +223,8 @@ Nationen.prototype._lookForStoredArticle = function(articleHtml, url){
 /**
  * Fetch comments from comment feed
  *
- * @param ...
+ * @param {Cheerio Object} The article HTML wrapped in Cheerio
+ * @param {String} The article ID
  * @api private
  */
 
@@ -226,6 +241,14 @@ Nationen.prototype._fetchComments = function(articleID, articleHtml){
 		me._parseFeed(articleHtml, body);
 	});
 };
+
+/**
+ * Parse the html using cheerio
+ *
+ * @param {Cheerio Object} The article HTML wrapped in Cheerio
+ * @param {String} The JSON body returned by the http request
+ * @api private
+ */
 
 Nationen.prototype._parseFeed = function(articleHtml, body){   
 	// we need to sanitize the response from the nationen url because the result is pure and utter crap
@@ -244,6 +267,15 @@ Nationen.prototype._parseFeed = function(articleHtml, body){
       this.retrieveFrontPage();
     }
 };
+
+/**
+ * Traverse through comments and retrieve data from each
+ *
+ * @param {String} HTML tree of comments
+ * @api private
+ *
+ * TODO: compare to database record and update ratings and missing comments
+ */
 
 Nationen.prototype._retrieveComments = function(content){
     var me = this,
@@ -287,6 +319,12 @@ Nationen.prototype._retrieveComments = function(content){
     this._distributeSoundBites();
   };
 
+ /**
+ * Handle transport of string data to chopping block and audio methods, while reporting back about the progress
+ * 
+ * @api private
+ */
+
 Nationen.prototype._distributeSoundBites = function(){
 	var me = this,
 		length = this.comments.length,
@@ -323,6 +361,13 @@ Nationen.prototype._distributeSoundBites = function(){
 	  });
 	}
 };
+
+/**
+ * Google TTS has a 100 character string limitation - we take care of that here + other friendly things
+ *
+ * @param {String} The raw comment text
+ * @api private
+ */
 
 Nationen.prototype._splitCommentInGoogleTTSFriendlyBites = function(comment){
 	var toSay = [],
@@ -379,6 +424,14 @@ Nationen.prototype._splitCommentInGoogleTTSFriendlyBites = function(comment){
 	return toSay;
 };
 
+/**
+ * Transporting and keeping track of audio conversion
+ *
+ * @param {Object} The comment object in the form of the Article schema
+ * @param {Array} The array holding Google TTS friendly comments
+ * @api private
+ */
+
 Nationen.prototype._converCommentsToAudio = function(commentObj, googleFriendlyCommentArr){
 	var me = this,
 		length = googleFriendlyCommentArr.length,
@@ -411,9 +464,25 @@ Nationen.prototype._converCommentsToAudio = function(commentObj, googleFriendlyC
 	}
 };
 
+/**
+ * Executing the actual Google TTS request
+ *
+ * @param {String} The Google TTS url with params to call
+ * @param {Function} The success callback
+ * @api private
+ */
+
 Nationen.prototype._googleTextToSpeech = function(url, callback){
 	request({ url : url, headers : { 'Referer' : '' }, encoding: 'binary' }, callback);
 };
+
+/**
+ * Converting audio data to base64 string, or die trying
+ *
+ * @param {Object} The response object from the request
+ * @param {String} The body retrieved by a http request
+ * @api private
+ */
 
 Nationen.prototype._convertTTSResponseToBase64 = function(response, body){
 	var data_uri_prefix = 'data:' + response.headers['content-type'] + ';base64,';
@@ -428,6 +497,13 @@ Nationen.prototype._convertTTSResponseToBase64 = function(response, body){
 
 	return data_uri_prefix + comment64;
 };
+
+/**
+ * The JSON coming from EB nationen is far from valid JSON. We need to sanitize it before being able to get anything out of it.
+ *
+ * @param {String} "JSON"
+ * @api private
+ */
 
 Nationen.prototype._sanitizeBogusJSON = function(bogusJSON){
     var content = bogusJSON.toString('utf8');
@@ -447,6 +523,13 @@ Nationen.prototype._sanitizeBogusJSON = function(bogusJSON){
 
     return content;
 };
+
+/**
+ * Return random number
+ *
+ * @param {Number} A max to the range in which to find a random number
+ * @api private
+ */
 
 Nationen.prototype._getRandom = function(max){
     return Math.floor(Math.random()*max);

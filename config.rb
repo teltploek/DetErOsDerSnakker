@@ -1,4 +1,4 @@
-# Sass config file to generate stylesheets for HKCRM 360
+# Sass config file
 
 # -- General --
 relative_assets = true

@@ -46,7 +46,7 @@ app.configure('development', function(){
 });
 
 app.configure('production', function(){
-  app.set('dbString', process.env.DBSTR);
+  app.set('dbString', process.env.DBSTR); // the db connection string is stored in nodejitsu dashboard as an environment variable
   app.use(express.errorHandler());
 });
 

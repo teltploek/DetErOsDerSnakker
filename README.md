@@ -49,6 +49,7 @@ Right now everything is work in progress, so don't expect anything to work yet.
   * ~~Some times the TTS conversion fails - find out why, and fix it.~~ Done!!
   * ~~Max '...'-conversion.~~ Done!!
   * Handle errors, eb downtime etc.
+  * Remove winston
   * Make ps1-script more generic using relative dirs
   * Put current version in footer of page (read package.json and render in frontend)
   * Google Analytics

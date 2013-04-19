@@ -7,12 +7,25 @@ block body
         .logo
         p Nationen on roids!
       .row
-        .span12(ng-show='!begun')
+        //- waiting - initial state
+        .span12(ng-show='state=="waiting"')
           fieldset
             .button-wrapper
               form.unveil-madness(ng-submit='pushButton()')
                 input.button(type='submit', value='UNVEIL MADNESS')
-        .span12(ng-cloak,ng-show='begun')
+        //- preparing
+        .span12(ng-cloak,ng-show='state=="preparing"')
+          .span8.offset2
+            .state-status
+              p(ng-repeat='message in messages | reverse ') {{message.text}}
+            .progress-wrapper(style='display:none;')
+              p Converting {{numberOfComments}} comments to sound.
+
+              p This might take a little while.
+                .progress.progress-striped.active
+                  .bar(style='width: {{progress}}%;') {{progressText}}
+        //- reading
+        .span12(ng-cloak,ng-show='state=="reading"')
           .row
             .comments.span8.offset2
                 legend
@@ -34,15 +47,3 @@ block body
                         div {{comment.bodyHTML}}
                   .clearfix
                   hr
-
-    .modal.hide.fade.progress-modal
-      .modal-header
-        h3 Wait for it...
-      .modal-body
-        p Converting {{numberOfComments}} comments to sound.
-
-        p This might take a little while.
-
-        .progress-wrapper(style='width:80%;margin:0 auto;')
-          .progress.progress-striped.active
-            .bar(style='width: {{progress}}%;') {{progressText}}
