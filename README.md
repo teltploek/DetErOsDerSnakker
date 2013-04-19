@@ -38,9 +38,10 @@ Right now everything is work in progress, so don't expect anything to work yet.
 
 ## TODOs
 
-  * Hook op progress to show earlier actions up to TTS-conversion.
+  * ~~Hook op progress to show earlier actions up to TTS-conversion.~~
+  * Fix dev database connection crash.
   * Check out AngularJS animations in new version.
-  * Remember beta-badge.
+  * ~~Remember beta-badge.~~
   * Remember github url in footer.
   * Remember author information in footer.
   * ~~Skip the narrating of web-addresses, smileys etc.~~ Done!!
@@ -51,7 +52,6 @@ Right now everything is work in progress, so don't expect anything to work yet.
   * Handle errors, eb downtime etc.
   * Remove winston
   * Make ps1-script more generic using relative dirs
-  * Put current version in footer of page (read package.json and render in frontend)
   * Google Analytics
 
 ---

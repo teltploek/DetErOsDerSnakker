@@ -33,6 +33,17 @@ body{
 	width:774px;
 	height:251px;
 	margin:0 auto;
+	position:relative;
+
+	.beta{
+		background:transparent url(/images/beta.png) no-repeat;
+		width:117px;
+		height:79px;
+		position:absolute;
+		right:0;
+		top:70px;
+		margin-right:-95px;
+	}
 }
 
 a{
