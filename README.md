@@ -32,23 +32,12 @@ Right now everything is work in progress, so don't expect anything to work yet.
 
  * Store previously converted articles in MongoDB database so we don't strain Google TTS service.
     * It's basically working, but once an article is stored no new comments will be added to its db-record - fix this
- * ~~Getting socket to communicate with the user per request rather than globally across all connections~~ Probably done... needs more testing.
- * ~~Getting weird unicode from comment feed translated to readable characters~~ Done!!
- * ~~Slicing up strings in 100 character bulks, sending to Google TTS and stiching up again afterwards~~ Done!!
 
 ## TODOs
 
-  * ~~Hook op progress to show earlier actions up to TTS-conversion.~~
+  * Translate progress to danish
   * Fix dev database connection crash.
   * Check out AngularJS animations in new version.
-  * ~~Remember beta-badge.~~
-  * Remember github url in footer.
-  * Remember author information in footer.
-  * ~~Skip the narrating of web-addresses, smileys etc.~~ Done!!
-  * ~~Cleaning up after article narration so we're able to read out the next one. Right now comments are mixed and matched.~~ Done !!
-  * ~~Convert names to remove stringified unicode chars.~~ Done!!
-  * ~~Some times the TTS conversion fails - find out why, and fix it.~~ Done!!
-  * ~~Max '...'-conversion.~~ Done!!
   * Handle errors, eb downtime etc.
   * Remove winston
   * Make ps1-script more generic using relative dirs

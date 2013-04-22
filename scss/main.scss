@@ -55,6 +55,7 @@ legend{
 
 .button-wrapper{
 	text-align: center;
+	height:400px;
 }
 
 .state-status{
@@ -62,7 +63,9 @@ legend{
 	height:60px;
 	overflow:hidden;
 }
-
+.preparing{
+	height:400px;
+}
 .comments{
 	height:400px;
 	max-height: 400px;
@@ -86,8 +89,7 @@ legend{
 }
 
 .progress-wrapper{
-	margin:0 auto;
-	width:80%;
+	margin:20px auto;
 }
 
 .img-wrapper{
@@ -114,5 +116,44 @@ legend{
 .comment-wrapper{
 	> div{
 		margin-left:20px;
+	}
+}
+
+.footer{
+	font-size:13px;
+	color:#222;
+
+	p {
+		margin-bottom:5px;
+	}
+
+	.social{
+		background:transparent no-repeat url(/images/social.png);
+		display: inline-block;		
+		width:32px;
+		height:32px;
+		margin-right:10px;
+
+		&.in{
+			background-position: -160px 0;
+
+			&:hover{
+				background-position: -160px -32px;
+			}
+		}
+		&.twitter{
+			background-position: -128px 0;
+
+			&:hover{
+				background-position: -128px -32px;
+			}
+		}
+		&.gplus{
+			background-position: 0 0;
+
+			&:hover{
+				background-position: 0 -32px;
+			}
+		}
 	}
 }

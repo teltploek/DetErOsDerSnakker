@@ -16,7 +16,7 @@ block body
                 input.button(type='submit', value='UNVEIL MADNESS')
         //- preparing
         .span12(ng-cloak,ng-show='state=="preparing"')
-          .span8.offset2
+          .preparing.span8.offset2
             .state-status
               p(ng-repeat='message in messages | reverse ') {{message.text}}
             .progress-wrapper(style='display:none;')
@@ -48,3 +48,14 @@ block body
                         div {{comment.bodyHTML}}
                   .clearfix
                   hr
+        .row
+          .footer.span8.offset2
+            .pull-left             
+              p Made by Brian Frisch
+              p
+                a.social.in(href="http://dk.linkedin.com/in/frischbrian/",target="_blank")
+                a.social.twitter(href="http://twitter.com/teltploek",target="_blank")
+                a.social.gplus(href="http://plus.google.com/103856422605997356830",target="_blank")
+            .pull-right 
+              p Source code: 
+                a(href="http://github.com/teltploek/DetErOsDerSnakker",target="_blank",style="text-decoration:underline;") github
