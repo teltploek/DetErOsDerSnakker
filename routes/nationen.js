@@ -1,7 +1,6 @@
 
 /*!
  * Nationen
- * TODO: documentation... as always...
  */
 
 /**
@@ -14,23 +13,20 @@ var request = require('request'),
     eventEmitter = require('events').EventEmitter,
     strutil = require('strutil'),
     _ = require('underscore'),
-    winston = require('winston'),
     mongoose = require('mongoose');
 
-// TODO: I'm not entirely happy with this schema... redo it to be nicer and more clean cut (ex. bodySoundbites is a horrible prop name)
 var articleSchema = mongoose.Schema({
-	articleID : String,
+	articleID : String,	
+	timesSeen: Number,
 	comments : [{
 		id : Number,
 		avatarUrl : String,
 		name : String,
 		date : String,
 		body : String,
-		bodyHTML : String,
 		rating : String,
-		bodySoundbites : Array
-	}],
-	count: Number
+		sound : Array
+	}]
 });
 
 var Article = mongoose.model('Article', articleSchema);
@@ -57,6 +53,7 @@ function Nationen(mainIO, mainSocket, roomID) {
   this.mainIO = mainIO;
 
   this.events = new eventEmitter;
+  this.existingArticle = false;
   this.articleID = '';
   this.comments = [];
 
@@ -118,7 +115,7 @@ Nationen.prototype.retrieveFrontPage = function(){
 Nationen.prototype._successMediator = function(body, callback){
 	var me = this;
 
-	this.mainIO.sockets.in(this.roomID).emit('new:status', 'ekstrabladet.dk fetched!');
+	this.mainIO.sockets.in(this.roomID).emit('new:status', 'Ekstrabladet.dk hentet...');
 
 	this._findArticle(body);
 };
@@ -131,7 +128,7 @@ Nationen.prototype._successMediator = function(body, callback){
  */
 
 Nationen.prototype._findArticle = function(body){
-    this.mainIO.sockets.in(this.roomID).emit('new:status', 'Fetching random article...');
+    this.mainIO.sockets.in(this.roomID).emit('new:status', 'Finder tilfældig artikel...');
 
     var $ = cheerio.load(body);
 
@@ -159,10 +156,12 @@ Nationen.prototype._findArticle = function(body){
 Nationen.prototype._fetchArticle = function(url){
 	var me = this;
 
+	this.articleID = this._parseArticleID(url);
+
 	request(url, function(error, response, body){
 		// if (error) return errorLogger.log('error', error);
 
-		me.mainIO.sockets.in(me.roomID).emit('new:status', 'Random article found:');
+		me.mainIO.sockets.in(me.roomID).emit('new:status', 'Tilfældig artikel fundet:');
 
 		var $ = cheerio.load(body);
 
@@ -175,7 +174,7 @@ Nationen.prototype._fetchArticle = function(url){
 
 		me.mainIO.sockets.in(me.roomID).emit('article:found', articleData);
 
-		me._lookForStoredArticle($, url);
+		me._fetchComments(me.articleID, $);
 	});
 };
 
@@ -191,36 +190,6 @@ Nationen.prototype._parseArticleID = function(url){
 };
 
 /**
- * Find out if this article is stored in the database
- *
- * @param {Cheerio Object} The article HTML wrapped in Cheerio
- * @param {String} the url for the article in question
- * @api private
- */
-
-Nationen.prototype._lookForStoredArticle = function(articleHtml, url){
-	var me = this;
-
-	// this.articleID = '1945143';
-	this.articleID = this._parseArticleID(url);
-
-
-	Article.find({ articleID : me.articleID }, function(err, results){
-		try{
-			if (results && results.length){
-				var result = results[0];
-
-				me.mainIO.sockets.in(me.roomID).emit('post:fetched', result.comments);
-			}else{
-				me._fetchComments(me.articleID, articleHtml);
-			}
-		}catch(e){
-			console.log(e);
-		}
-	})
-};
-
-/**
  * Fetch comments from comment feed
  *
  * @param {Cheerio Object} The article HTML wrapped in Cheerio
@@ -231,9 +200,12 @@ Nationen.prototype._lookForStoredArticle = function(articleHtml, url){
 Nationen.prototype._fetchComments = function(articleID, articleHtml){
 	var me = this;
 
+	//var articleID = '1962197';
+	//me.articleID = articleID;
+
 	var commentsUrl = 'http://orange.ekstrabladet.dk/comments/get.json?disable_new_comments=false&target=comments&comments_expand=true&notification=comment&id='+articleID+'&client_width=610&max_level=100&context=default';
 
-	this.mainIO.sockets.in(this.roomID).emit('new:status', 'Fetching nationen comments...');
+	this.mainIO.sockets.in(this.roomID).emit('new:status', 'Henter tilhørende Nationen kommmentarer...');
 
 	request(commentsUrl, function(error, response, body){
   		// if (error) return errorLogger.log('error', error);
@@ -261,11 +233,40 @@ Nationen.prototype._parseFeed = function(articleHtml, body){
     if (commentObj.length){
       this.mainIO.sockets.in(this.roomID).emit('article:comments', commentObj.length);
 
-      this._retrieveComments(content);
+      this._retrieveCommentObject(content);
     }else{
-      this.mainIO.sockets.in(this.roomID).emit('new:status', 'No comments for this article - finding new article...');
+      this.mainIO.sockets.in(this.roomID).emit('new:status', 'Ingen kommentarer til denne artikel - finder ny artikel...');
       this.retrieveFrontPage();
     }
+};
+
+/**
+ * Find out if this article is stored in the database and return 
+ * the comment array or an empty array
+ *
+ * @param {String} the articleID for the article to retrieve
+ * @api private
+ */
+
+Nationen.prototype._retrieveCommentObject = function(content){
+	var me = this;
+
+	Article.find({ articleID : me.articleID }, function(err, results){
+		try{
+			if (results && results.length){
+				var result = results[0];
+
+				me.existingArticle = true;
+				me._retrieveComments(content, result.comments);
+			}else{
+				me.existingArticle = false;
+				me._retrieveComments(content, []);
+			}
+		}catch(e){
+			me.existingArticle = false;
+			me._retrieveComments(content, []);
+		}
+	})
 };
 
 /**
@@ -273,48 +274,71 @@ Nationen.prototype._parseFeed = function(articleHtml, body){
  *
  * @param {String} HTML tree of comments
  * @api private
- *
- * TODO: compare to database record and update ratings and missing comments
  */
-
-Nationen.prototype._retrieveComments = function(content){
+Nationen.prototype._retrieveComments = function(content, existingComments){
     var me = this,
     	$ = cheerio.load(content),
         i = 0;
+
+    // utils object for the retrieval of DOM node data
+    var utils = {
+		get : {
+			avatarUrl : function(cheerioObj){
+				return cheerioObj.find('.comment-inner').first().find('.avatar img').attr('src');
+			},
+			handle : function(cheerioObj){
+				return cheerioObj.find('.comment-inner').first().find('.name-date .name').text();
+			},
+			date : function(cheerioObj){
+				return cheerioObj.find('.comment-inner').first().find('.name-date .date').text();
+			},
+			rating : function(cheerioObj){
+				return cheerioObj.find('.comment-inner').first().find('.rating-buttons .rating').text();
+			},
+			body : function($, cheerioObj){
+				var body = '';
+				cheerioObj.find('.comment-inner').first().find('.body p').each(function(i, elem){
+	        		body = body + ' ' + $(elem).text();
+	      		});
+
+	      		return body;
+			}
+		},
+		// there are stringified unicode characters in the comment feed - we need to JSON.parse them to get readable characters
+		convertStringifiedUnicodeString : function(str){
+			return JSON.parse("{ \"ent\" : \""+ str +"\" }").ent;
+		}
+	};
     
-    this.mainIO.sockets.in(this.roomID).emit('new:status', 'Comments found - retrieving comments...');
+    this.mainIO.sockets.in(this.roomID).emit('new:status', 'Kommentarer fundet - indsamler kommentarer...');
 
     $('li.comment').each(function(){
-      var comment = {
-        id : i,
-        avatarUrl : $(this).find('.comment-inner').first().find('.avatar img').attr('src'),
-        name : $(this).find('.comment-inner').first().find('.name-date .name').text(),
-        date : $(this).find('.comment-inner').first().find('.name-date .date').text(),
-        body : '',
-        bodyHTML : '',
-        rating : $(this).find('.comment-inner').first().find('.rating-buttons .rating').text(),
-        bodySoundbites : [] // this array will hold all the base64 encoded sound bites for an entire comment
-      };
+		var existingComment = existingComments[i],
+			comment,
+			commentElm = $(this);
 
-      $(this).find('.comment-inner').first().find('.body p').each(function(i, elem){
-        comment.body = comment.body + ' ' + $(elem).text();
-      });
-  
-      // there are stringified unicode characters in the comment feed - we need to JSON.parse them to get readable characters
-      var parseSource = "{ \"comment\" : \""+ comment.body +"\" }";
-      var parsedName = JSON.parse("{ \"name\" : \""+ comment.name +"\" }");
-      var parsedComment = JSON.parse(parseSource);
+		if (existingComment){ // if we already have this comment in our database, we should just update the rating and date
+			comment = existingComment;
+			comment.rating = utils.get.rating(commentElm);
+			comment.date = utils.get.date(commentElm);
+		}else{
+			var comment = {
+				id : i,
+				avatarUrl : utils.get.avatarUrl(commentElm),
+				name : utils.convertStringifiedUnicodeString(utils.get.handle(commentElm)),
+				date : utils.get.date(commentElm),
+				body : utils.convertStringifiedUnicodeString(utils.get.body($, commentElm)),
+				rating : utils.get.rating(commentElm),
+				sound : [] // this array will hold all the base64 encoded sound bites for an entire comment
+			};
+		};
 
-      comment.name = parsedName.name;
-      comment.body = parsedComment.comment;
-      comment.bodyHTML = comment.body;
+      	me.comments.push(comment);
 
-      me.comments.push(comment);
+      	i++;
+	});   
 
-      i++;
-    });   
-
-    this.mainIO.sockets.in(this.roomID).emit('new:status', 'All comments retrieved. Running them by Google TTS...');
+    this.mainIO.sockets.in(this.roomID).emit('new:status', 'Alle kommentarer indsamlet. Konverterer til lyd...');
 
     this._distributeSoundBites();
   };
@@ -334,31 +358,47 @@ Nationen.prototype._distributeSoundBites = function(){
 	    article;
 
 	for (i = 0; i < length; ++i) {
-	  var commentObj = this.comments[i];
+		var commentObj = this.comments[i];
 
-	  var googleTTSFriendlyComment = this._splitCommentInGoogleTTSFriendlyBites(commentObj.body); // we need to split comment in to bulks of 100 characters
+		this.events.on('tts:done:' + commentObj.id, function(finishedCommentObj) {
+			convertedComments[finishedCommentObj.id] = finishedCommentObj;
 
-	  this._converCommentsToAudio(commentObj, googleTTSFriendlyComment);
+			allCommentQueue = allCommentQueue - 1;
 
-	  this.events.on('tts:done:' + commentObj.id, function(finishedCommentObj){
-	    convertedComments[finishedCommentObj.id] = finishedCommentObj;
+			me.mainIO.sockets.in(me.roomID).emit('progress:update', allCommentQueue);
 
-	    allCommentQueue = allCommentQueue - 1;
+			if (allCommentQueue == 0){
 
-	    me.mainIO.sockets.in(me.roomID).emit('progress:update', allCommentQueue);
+				// find out if we should update existing db record or create new one
+				if (me.existingArticle){
+					Article.update(
+						{ articleID : me.articleID },
+						{ $set: { comments: convertedComments }, $inc: { timesSeen : 1 } },
+						function(){
+							me.mainIO.sockets.in(me.roomID).emit('post:fetched', convertedComments);
+						}
+					);
+					}else{
+						article = new Article({
+							articleID : me.articleID,
+							comments: convertedComments,
+							timesSeen: 1
+					});
 
-	    if (allCommentQueue == 0){
-	    	article = new Article({
-	    		articleID : me.articleID,
-	    		comments: convertedComments
-	    	});
+					article.save(function(){
+						me.mainIO.sockets.in(me.roomID).emit('post:fetched', convertedComments);
+					});
+				}
+			}
+		});
 
-	    	article.save(function(){
-	    		me.mainIO.sockets.in(me.roomID).emit('post:fetched', convertedComments);
-	    	})
+		if (commentObj.sound.length == 0){
+			var googleTTSFriendlyComment = this._splitCommentInGoogleTTSFriendlyBites(commentObj.body); // we need to split comment in to bulks of 100 characters
 
-	      }
-	  });
+			this._converCommentsToAudio(commentObj, googleTTSFriendlyComment);
+		}else{
+			this.events.emit('tts:done:' + commentObj.id, commentObj);
+		}
 	}
 };
 
@@ -443,7 +483,7 @@ Nationen.prototype._converCommentsToAudio = function(commentObj, googleFriendlyC
 	      commentPart = googleFriendlyCommentArr[i];
 
 	  this._googleTextToSpeech('http://translate.google.com/translate_tts?deods='+idx+'&ie=utf-8&tl=da&q='+ commentPart, function(error, response, body){
-	    if (error) return errorLogger.log('error', error);
+	    //if (error) return errorLogger.log('error', error);
 
 	    var comment64 = me._convertTTSResponseToBase64(response, body);
 
@@ -453,7 +493,7 @@ Nationen.prototype._converCommentsToAudio = function(commentObj, googleFriendlyC
 	    // "First do it, then do it right, then do it better" - quote: Addy Osmani
 	    var soundBiteIdx = response.request.uri.query.split('&')[0].split('=')[1];
 
-	    commentObj.bodySoundbites[soundBiteIdx] = comment64;
+	    commentObj.sound[soundBiteIdx] = comment64;
 
 	    conversionQueue = conversionQueue - 1;
 

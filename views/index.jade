@@ -20,9 +20,9 @@ block body
             .state-status
               p(ng-repeat='message in messages | reverse ') {{message.text}}
             .progress-wrapper(style='display:none;')
-              p Converting {{numberOfComments}} comments to sound.
+              p Konverterer {{numberOfComments}} kommentarer til lyd.
 
-              p This might take a little while.
+              p Det tager muligvis lige et par minutter.
                 .progress.progress-striped.active
                   .bar(style='width: {{progress}}%;') {{progressText}}
         //- reading
@@ -45,17 +45,17 @@ block body
                         .img-wrapper
                           img(ng-src='{{comment.avatarUrl}}')
                       .span6.comment-wrapper
-                        div {{comment.bodyHTML}}
+                        div {{comment.body}}
                   .clearfix
                   hr
         .row
           .footer.span8.offset2
             .pull-left             
-              p Made by Brian Frisch
+              p Af Brian Frisch
               p
                 a.social.in(href="http://dk.linkedin.com/in/frischbrian/",target="_blank")
                 a.social.twitter(href="http://twitter.com/teltploek",target="_blank")
                 a.social.gplus(href="http://plus.google.com/103856422605997356830",target="_blank")
             .pull-right 
-              p Source code: 
+              p Kildekode: 
                 a(href="http://github.com/teltploek/DetErOsDerSnakker",target="_blank",style="text-decoration:underline;") github

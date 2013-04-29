@@ -20,7 +20,7 @@ function AppCtrl($scope, socket) {
   socket.on('post:fetched', function (allCommentsArr) {    
     $scope.comments = allCommentsArr;
 
-    $scope.messages.push({ text : 'All comments for article received by front-end - getting ready to play...' });   
+    $scope.messages.push({ text : 'Alle kommentarer til artiklen er færdigbehandlet - gør klar til højtlæsning...' });   
 
     setTimeout(function(){
       $scope.state = 'reading';
@@ -97,7 +97,7 @@ function AppCtrl($scope, socket) {
   };
 
   var playSoundbite = function(commentIdx, biteIdx){
-    var soundBites = $scope.comments[commentIdx].bodySoundbites;
+    var soundBites = $scope.comments[commentIdx].sound;
 
     if (!soundBites[biteIdx]){
       initializeComment(1+commentIdx);

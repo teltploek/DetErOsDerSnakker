@@ -28,20 +28,18 @@ and point your browser to http://localhost:3000
 
 Right now everything is work in progress, so don't expect anything to work yet.
 
-## Working on...
-
- * Store previously converted articles in MongoDB database so we don't strain Google TTS service.
-    * It's basically working, but once an article is stored no new comments will be added to its db-record - fix this
-
 ## TODOs
 
-  * Translate progress to danish
+  * ~~Translate progress to danish~~
   * Fix dev database connection crash.
   * Check out AngularJS animations in new version.
   * Handle errors, eb downtime etc.
-  * Remove winston
-  * Make ps1-script more generic using relative dirs
+  * ~~Remove winston~~
   * Google Analytics
+
+## Nice to have
+
+  * Make ps1-script more generic using relative dirs
 
 ---
 Wasting time since 1981
