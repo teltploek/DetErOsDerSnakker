@@ -105,11 +105,11 @@ function AppCtrl($scope, socket) {
 
     var soundBite = soundBites[biteIdx];
 
-    var snd = new Audio(soundBite);
+    var snd = new buzz.sound(soundBite);
 
-    snd.addEventListener('ended', function() { 
+    snd.bind('ended', function(e) {
       playSoundbite(commentIdx, 1+biteIdx);
-    }, true);   
+    });
     
     snd.play();
   };

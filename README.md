@@ -31,14 +31,11 @@ Right now everything is work in progress, so don't expect anything to work yet.
 ## TODOs
 
   * We might need to make request a child_process
-  * ~~Translate progress to danish~~
   * Fix dev database connection crash.
-  * Check out AngularJS animations in new version.
-  * Handle errors, eb downtime etc.
-  * ~~Remove winston~~
   * Google Analytics
   * Show direct link to article feed with share-button to facebook/twitter/google plus
-  * Bookmarklet
+  * Bookmarklet (and Google Analytics)
+  * Add Jekyll blog
 
 ## Nice to have
 
