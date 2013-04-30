@@ -1,6 +1,6 @@
 {
     "name": "DetErOsDerSnakker",
-    "version": "0.0.9-2",
+    "version": "0.0.9-3",
     "author": {
         "name": "Brian Frisch",
         "email": "brian@frisch.io",
@@ -16,7 +16,6 @@
         "bufferlist": "*",
         "strutil": "*",
         "underscore": "*",
-        "winston": "*",
         "mongoose": "latest"
     },
     "devDependencies": {
@@ -25,6 +24,10 @@
         "compass": "*"
     },
     "subdomain": "deterosdersnakker",
+    "domains": [
+        "deterosdersnakker.dk",
+        "www.deterosdersnakker.dk"
+    ],
     "scripts": {
         "start": "node app.js"
     },

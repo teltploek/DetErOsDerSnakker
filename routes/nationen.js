@@ -15,6 +15,7 @@ var request = require('request'),
     _ = require('underscore'),
     mongoose = require('mongoose');
 
+// Database schema
 var articleSchema = mongoose.Schema({
 	articleID : String,	
 	timesSeen: Number,
@@ -55,9 +56,28 @@ function Nationen(mainIO, mainSocket, roomID) {
   this.events = new eventEmitter;
   this.existingArticle = false;
   this.articleID = '';
+  this.articleUrl = '';
   this.comments = [];
 
   this.isDbConnected = false;
+};
+
+Nationen.prototype.reset = function(){
+	this.events = new eventEmitter;
+  	this.existingArticle = false;
+  	this.articleID = '';
+  	this.articleUrl = '';
+  	this.comments = [];
+};
+
+/**
+ * Used when users wants a certain article
+ *
+ * @api public
+ */
+
+Nationen.prototype.setArticleUrl = function(url){
+	this.articleUrl = url;
 };
 
 /**
@@ -69,6 +89,9 @@ function Nationen(mainIO, mainSocket, roomID) {
 Nationen.prototype.beginAfterDbConnection = function(dbConnectionString){
 	var me = this;
 
+	// FIXME: this isn't working properly - and is not the supported way to check connection status
+	this.isDbConnected = mongoose.connection._hasOpened;
+
 	if (!this.isDbConnected){
 		mongoose.connect(dbConnectionString);
 
@@ -77,10 +100,18 @@ Nationen.prototype.beginAfterDbConnection = function(dbConnectionString){
 		this.db.once('open', function(){
 			me.isDbConnected = true;
 
-			me.retrieveFrontPage();
+			if (me.articleUrl === ''){
+				me.retrieveFrontPage();
+			}else{
+				me._fetchArticle(me.articleUrl);
+			}
 		});
 	}else{
-		this.retrieveFrontPage();
+		if (this.articleUrl === ''){
+			this.retrieveFrontPage();
+		}else{
+			this._fetchArticle(me.articleUrl);
+		}
 	}
 };
 
@@ -155,26 +186,27 @@ Nationen.prototype._findArticle = function(body){
 
 Nationen.prototype._fetchArticle = function(url){
 	var me = this;
-
+	
 	this.articleID = this._parseArticleID(url);
 
-	request(url, function(error, response, body){
+	request({ followAllRedirects : true, url : url }, function(error, response, body){
 		// if (error) return errorLogger.log('error', error);
+	
+		me.mainIO.sockets.in(me.roomID).emit('new:status', 'Artikel fundet:');
 
-		me.mainIO.sockets.in(me.roomID).emit('new:status', 'Tilfældig artikel fundet:');
 
 		var $ = cheerio.load(body);
 
 		var articleData = {
 			title : $('h1.rubrik').first().text(),
 			href  : url
-		}
+		};
 
 		me.mainIO.sockets.in(me.roomID).emit('new:status', '' + articleData.title + ' - ' + articleData.href);
 
 		me.mainIO.sockets.in(me.roomID).emit('article:found', articleData);
 
-		me._fetchComments(me.articleID, $);
+		me._fetchComments(me.articleID);
 	});
 };
 
@@ -197,11 +229,8 @@ Nationen.prototype._parseArticleID = function(url){
  * @api private
  */
 
-Nationen.prototype._fetchComments = function(articleID, articleHtml){
+Nationen.prototype._fetchComments = function(articleID){
 	var me = this;
-
-	//var articleID = '1962197';
-	//me.articleID = articleID;
 
 	var commentsUrl = 'http://orange.ekstrabladet.dk/comments/get.json?disable_new_comments=false&target=comments&comments_expand=true&notification=comment&id='+articleID+'&client_width=610&max_level=100&context=default';
 
@@ -210,7 +239,7 @@ Nationen.prototype._fetchComments = function(articleID, articleHtml){
 	request(commentsUrl, function(error, response, body){
   		// if (error) return errorLogger.log('error', error);
 
-		me._parseFeed(articleHtml, body);
+		me._parseFeed(body);
 	});
 };
 
@@ -222,7 +251,7 @@ Nationen.prototype._fetchComments = function(articleID, articleHtml){
  * @api private
  */
 
-Nationen.prototype._parseFeed = function(articleHtml, body){   
+Nationen.prototype._parseFeed = function(body){   
 	// we need to sanitize the response from the nationen url because the result is pure and utter crap
     var content = this._sanitizeBogusJSON(body);
 
@@ -255,8 +284,8 @@ Nationen.prototype._retrieveCommentObject = function(content){
 		try{
 			if (results && results.length){
 				var result = results[0];
-
 				me.existingArticle = true;
+	
 				me._retrieveComments(content, result.comments);
 			}else{
 				me.existingArticle = false;
@@ -306,7 +335,12 @@ Nationen.prototype._retrieveComments = function(content, existingComments){
 		},
 		// there are stringified unicode characters in the comment feed - we need to JSON.parse them to get readable characters
 		convertStringifiedUnicodeString : function(str){
-			return JSON.parse("{ \"ent\" : \""+ str +"\" }").ent;
+			try{
+				return JSON.parse("{ \"ent\" : \""+ str +"\" }").ent;
+			}
+			catch(e){
+				return str;
+			}
 		}
 	};
     
@@ -324,12 +358,12 @@ Nationen.prototype._retrieveComments = function(content, existingComments){
 		}else{
 			var comment = {
 				id : i,
-				avatarUrl : utils.get.avatarUrl(commentElm),
-				name : utils.convertStringifiedUnicodeString(utils.get.handle(commentElm)),
-				date : utils.get.date(commentElm),
-				body : utils.convertStringifiedUnicodeString(utils.get.body($, commentElm)),
-				rating : utils.get.rating(commentElm),
-				sound : [] // this array will hold all the base64 encoded sound bites for an entire comment
+				avatarUrl 	: utils.get.avatarUrl(commentElm),
+				name 		: utils.convertStringifiedUnicodeString(utils.get.handle(commentElm)),
+				date 		: utils.get.date(commentElm),
+				body 		: utils.convertStringifiedUnicodeString(utils.get.body($, commentElm)),
+				rating 		: utils.get.rating(commentElm),
+				sound 		: [] // this array will hold all the base64 encoded sound bites for an entire comment
 			};
 		};
 

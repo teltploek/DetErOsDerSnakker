@@ -22,6 +22,7 @@ grunt.stdout.on('data', function(data) {
 
 var app = module.exports = express();
 var server = require('http').createServer(app);
+var articleUrl = '';
 
 // Hook Socket.io into Express
 var io = require('socket.io').listen(server);
@@ -51,10 +52,13 @@ app.configure('production', function(){
 });
 
 // Routes
-app.get('/', routes.index);
+app.get('/', function(req, res){
+  if (req.query.a){    
+    articleUrl = req.query.a;
+  }
 
-// redirect all others to the index (HTML5 history)
-// app.get('*', routes.index);
+  routes.index(req, res);
+});
 
 // Socket.io Communication
 io.sockets.on('connection', function(socket){
@@ -65,6 +69,12 @@ io.sockets.on('connection', function(socket){
   var N = new Nationen(io, socket, roomID);
 
   socket.on('app:begin', function(){
+    N.reset();
+    
+    if (articleUrl !== ''){
+      N.setArticleUrl(articleUrl);
+    };
+
     N.beginAfterDbConnection(process.env.DBSTR);
   });
 });
