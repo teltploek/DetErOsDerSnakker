@@ -27,9 +27,10 @@ function AppCtrl($scope, socket) {
 
       $('.progress-wrapper').hide();
 
-      console.log($('.fb-like').length);
-      $('.fb-like').attr('href', 'http://deterosdersnakker.dk/?a=' + $scope.articleData.cleanHref);
-      $('.fb-like').attr('data-href', 'http://deterosdersnakker.dk/?a=' + $scope.articleData.cleanHref);
+      if (typeof(FB) !== 'undefined'){
+        $('li.fb').html('<div class="fb-like" data-href="http://deterosdersnakker.dk/?a='+$scope.articleData.cleanHref+'" data-send="false" data-layout="button_count" data-width="20" data-show-faces="false" data-action="recommend"></div>');
+        FB.XFBML.parse();
+      }
 
       if(typeof(twttr) !== 'undefined') {
         $('li.twitter').html('<a href="https://twitter.com/share" class="twitter-share-button" data-count="none" data-text="Højtlæsning af Nationen kommentarer for &quot;'+$scope.articleData.title+'&quot; " data-lang="da" data-url="http://deterosdersnakker.dk?a='+$scope.articleData.cleanHref+'" data-hashtags="deterosdersnakker">Tweet</a>');

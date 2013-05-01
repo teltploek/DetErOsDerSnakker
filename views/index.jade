@@ -9,7 +9,7 @@ block body
            js = d.createElement(s); js.id = id;
            js.src = "//connect.facebook.net/da_DK/all.js#xfbml=1&appId=154863778023261";
            fjs.parentNode.insertBefore(js, fjs);
-        }(document, 'script', 'facebook-jssdk'));
+        }(document, 'script', 'facebook-jssdk')); 
 
   div(ng-controller='AppCtrl')
     .container
@@ -47,9 +47,9 @@ block body
                   a(href='http://deterosdersnakker.dk/?a={{articleData.cleanHref}}', target='_blank') Direkte link til højtlæsning af denne artikel.
                 .actions.pull-right
 
+                  //- will be populated by controller
                   ul.share
-                    li
-                      .fb-like(data-href="", data-send="false", data-layout="button_count", data-width="20", data-show-faces="false", data-action="recommend")
+                    li.fb
                     li.twitter                     
 
                 .clearfix
@@ -82,4 +82,4 @@ block body
               p Kildekode: 
                 a(href="http://github.com/teltploek/DetErOsDerSnakker",target="_blank",style="text-decoration:underline;") github
 
-  .fb-like-box(data-href='https://www.facebook.com/DetErOsDerSnakker', data-width='292', data-height='150', data-show-faces='true', data-stream='true', data-header='true')
+  .fb-like-box(data-href='https://www.facebook.com/595744360436120', data-width='292', data-height='150', data-show-faces='true', data-stream='true', data-header='true')
