@@ -2,23 +2,22 @@
 html(ng-app="myApp")
   head
     meta(charset='utf8')
+
+    meta(property="og:url", content="http://deterosdersnakker.dk")
+    meta(property="og:image", content="http://deterosdersnakker.dk/images/deods.png")
+    meta(property="og:site_name", content="DetErOsDerSnakker")
+    meta(property="og:description", content="Description of my product.")
+
     base(href='/')
     title Det er os der snakker
     link(rel='stylesheet', href='/css/main.css')
   body
     block body
 
-    div(id='fb-root')
-        script
-            (function(d, s, id) {
-               var js, fjs = d.getElementsByTagName(s)[0];
-               if (d.getElementById(id)) {return;}
-               js = d.createElement(s); js.id = id;
-               js.src = "//connect.facebook.net/da_DK/all.js#xfbml=1&appId=154863778023261";
-               fjs.parentNode.insertBefore(js, fjs);
-            }(document, 'script', 'facebook-jssdk'));
-
     script(src='js/lib/jquery.min.js')
+
+    script
+      !function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="https://platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");
         
     script
         var _gaq=[['_setAccount','UA-40079687-1'],['_trackPageview']];

@@ -34,8 +34,11 @@ Right now everything is work in progress, so don't expect anything to work yet.
   * Fix dev database connection crash.
   * Google Analytics
   * Show direct link to article feed with share-button to facebook/twitter/google plus
-  * Bookmarklet (and Google Analytics)
-  * Add Jekyll blog
+  * Add Jekyll blog with bookmarklet instructions
+
+## Known issues
+
+  * App isn't restarting when feed is done.
 
 ## Nice to have
 

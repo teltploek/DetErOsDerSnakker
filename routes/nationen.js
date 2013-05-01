@@ -77,7 +77,7 @@ Nationen.prototype.reset = function(){
  */
 
 Nationen.prototype.setArticleUrl = function(url){
-	this.articleUrl = url;
+	this.articleUrl = 'http://' + url;
 };
 
 /**
@@ -198,8 +198,9 @@ Nationen.prototype._fetchArticle = function(url){
 		var $ = cheerio.load(body);
 
 		var articleData = {
-			title : $('h1.rubrik').first().text(),
-			href  : url
+			title : $('h1.rubrik').first().text().trim(),
+			href  : url,
+			cleanHref : url.split('http://')[1] // href used for facebook like link
 		};
 
 		me.mainIO.sockets.in(me.roomID).emit('new:status', '' + articleData.title + ' - ' + articleData.href);
