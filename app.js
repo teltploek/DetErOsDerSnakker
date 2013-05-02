@@ -53,6 +53,8 @@ app.configure('production', function(){
 app.get('/', function(req, res){
   if (req.query.a){    
     articleUrl = req.query.a;
+  }else{
+    articleUrl = '';
   }
 
   routes.index(req, res);
