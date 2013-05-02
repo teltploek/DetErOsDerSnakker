@@ -34,6 +34,7 @@ app.configure(function(){
   app.set('view options', {
     layout: false
   });
+
   app.use(express.bodyParser());
   app.use(express.methodOverride());
   app.use(express.static(__dirname + '/public'));
@@ -59,6 +60,9 @@ app.get('/', function(req, res){
 
   routes.index(req, res);
 });
+
+app.get('/velkommen', routes.welcome);
+app.get('/bookmarklet', routes.bookmarklet);
 
 // Socket.io Communication
 io.sockets.on('connection', function(socket){

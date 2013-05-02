@@ -26,6 +26,20 @@ hr{
 	}
 }
 
+.navbar-inner{
+	background:transparent url(/images/grey_wash_wall.png);
+	
+	.nav > li > a{
+		color:#fff;
+		text-shadow:0 1px 0 #222;
+		font-weight: normal;
+
+		&:hover{
+			color:#eee;
+		}
+	}
+}
+
 .actions{
 	margin:3px 0;
 
@@ -43,6 +57,21 @@ ul{
 			display:inline;
 			margin-left:10px;
 		}
+	}
+}
+
+a{
+	font-weight: bold;
+
+	&.bookmarklet{
+		display:inline-block;
+		margin:10px;
+		padding:10px 20px;
+		font-size:16px;
+		color:#fff;
+		text-shadow:0 1px 0 #222;
+		@include border-radius(4px);
+		background-color:#555;
 	}
 }
 

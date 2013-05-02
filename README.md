@@ -1,4 +1,4 @@
-# Det Er Os Der Snakker [![Nodejitsu Deploy Status Badges](https://webhooks.nodejitsu.com/teltploek/DetErOsDerSnakker.png)](https://webops.nodejitsu.com#teltploek/webhooks)
+# Det Er Os Der Snakker
 
 Will fetch comments from Ekstra Bladets nationen, and read them out loud. In other words: A multi-billion $ project in the making.
 
@@ -30,8 +30,7 @@ Right now everything is work in progress, so don't expect anything to work yet.
 
 ## TODOs
 
-  * We might need to make request a child_process
-  * Show direct link to article feed with share-button to facebook/twitter/google plus
+  * We might need to make request a child_process 
   * Add Jekyll blog with bookmarklet instructions
   * Show "Chrome desktop only" splash screen for other browsers
 

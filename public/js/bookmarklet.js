@@ -72,7 +72,7 @@ function returnTpl(){
     content +='<div class="button-wrapper">';
       content +='<h1>'+title+'</h1>';
       content +='<p>Tryk p&aring; knappen herunder for at f&aring; Nationen-kommentarerne l&aelig;st h&oslash;jt.';
-      content +='<input type="submit" class="button" value="G&aring; til h&oslash;jtl&aelig;sning" onclick="location.href=\'http://localhost:3000\/?a='+url+'\';" />';
+      content +='<input type="submit" class="button" value="G&aring; til h&oslash;jtl&aelig;sning" onclick="location.href=\'http://deterosdersnakker.dk\/?a='+url+'\';" />';
     content +='</div>';
   }else{
     content +='<div class="button-wrapper">';
@@ -97,7 +97,7 @@ function applyCss(url){
 }
 
 (function(){
-  applyCss('http://localhost:3000/css/bookmarklet.css');
+  applyCss('http://deterosdersnakker.dk/css/bookmarklet.css');
  
   var element = document.createElement('div');
   element.id = "deods";

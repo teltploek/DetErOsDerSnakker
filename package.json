@@ -1,6 +1,6 @@
 {
     "name": "DetErOsDerSnakker",
-    "version": "0.0.9-6",
+    "version": "0.0.9-7",
     "author": {
         "name": "Brian Frisch",
         "email": "brian@frisch.io",
@@ -21,6 +21,7 @@
     "devDependencies": {
         "grunt": "*",
         "grunt-compass": "*",
+        "grunt-jekyll": "latest",
         "compass": "*"
     },
     "subdomain": "deterosdersnakker",
