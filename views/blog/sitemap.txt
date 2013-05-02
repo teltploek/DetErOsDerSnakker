@@ -1,0 +1,8 @@
+
+http://deterosdersnakker.dk/blog/atom.xml
+http://deterosdersnakker.dk/blog/bookmarklet.html
+http://deterosdersnakker.dk/blog/index.html
+http://deterosdersnakker.dk/blog/rss.xml
+http://deterosdersnakker.dk/blog/sitemap.txt
+
+http://deterosdersnakker.dk/blog/lessons/2011/12/29/jekyll-introduction

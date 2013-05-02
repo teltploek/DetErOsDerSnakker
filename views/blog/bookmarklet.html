@@ -1,0 +1,91 @@
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>Bookmarklet</title>
+    
+    <meta name="author" content="Brian Frisch">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="/css/main.css" rel="stylesheet" type="text/css" media="all">
+
+  </head>
+
+  <body>
+    <div class="navbar">
+      <div class="navbar-inner">
+        <div class="container">
+          <ul class="nav">
+            <li><a href="/">Forside</a></li>
+            <li><a href="/velkommen">Velkommen</a></li>
+            <li><a href="/bookmarklet">Bookmarklet</a></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="container">
+      <div class="hero-unit">
+        <div class="logo">
+          <div class="beta"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="container">
+
+      <div class="content">
+        
+<!-- <div class="page-header">
+  <h1>Bookmarklet  <small>foo</small></h1>
+</div> -->
+
+<div class="row-fluid">
+  <div class="span12">
+    
+
+<h1 id='bookmarklet'>Bookmarklet</h1>
+
+<p>DetErOsDerSnakker tilbyder en bookmarklet til et-klik igangsætning af Nationen-højtlæsning. Installér denne bookmarklet, hvis du vil gå direkte til højtlæsning mens du befinder dig på en ekstrabladet.dk artikel.</p>
+
+<h3 id="installation">Installation</h3>
+
+<p>Træk følgende mørkegrå blok <a class="bookmarklet" href="javascript:(function(){_my_script=document.createElement('SCRIPT');_my_script.type='text/javascript';_my_script.src='http://deterosdersnakker.dk/js/bookmarklet.js?'+(Math.random());document.getElementsByTagName('head')[0].appendChild(_my_script);})();">Det Er Os Der Snakker</a> til din bogmærke-værktøjslinje i browseren.</p>
+
+<p>Når det er gjort er bookmarkleten installeret. Prøv at trykke på den.</p>
+
+<h3 id="generelt">Generelt om Bookmarklets</h3>
+
+<p>En bookmarklet er et bogmærke der er gemt i en webbrowser, som indeholder JavaScript-kommandoer til at udvide browserens funktionalitet. For eksempel kan en bookmarklet tillade brugeren at vælge tekst på en side, klikke på bookmarkletet, og herefter blive præsenteret for et søgeresultat for den markerede tekst.</p>
+
+<p>Bookmarklets er scripts gemt som webadressen på et bogmærke i en webbrowser eller som et hyperlink på en webside. Uanset om bookmarklets funktioner gemmes som bogmærker eller hyperlinks, er de designet til at tilføje et-klik funktionalitet i en browser eller til en webside.</p>
+
+<p>Et klik på DetErOsDerSnakker-bookmarklet undersøger den webside man har åben. Hvis man befinder sig på en artikel på ekstrabladet.dk vil den finde ud af om der er Nationen kommentarer dertil og tilbyde et direkte link til højtlæsningen af kommentarstrømmen.</p>
+  </div>
+</div>
+
+
+      </div>
+      <hr>
+      <footer>
+        <p>2013 Brian Frisch
+        </p>
+      </footer>
+
+    </div>
+
+    <script type="text/javascript">
+      var _gaq = _gaq || [];
+      _gaq.push(['_setAccount', 'UA-40079687-1']);
+      _gaq.push(['_trackPageview']);
+
+      (function() {
+        var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+        ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+      })();
+    </script>
+  </body>
+</html>
+
