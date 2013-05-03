@@ -15,10 +15,8 @@ var articleUrl = '';
 var io = require('socket.io').listen(server);
 
 // AppFog does not support socket.io - we need to set it to xhr-polling
-io.configure('development', function(){
-  io.set('transports', ['xhr-polling']);
-  io.set('polling duration', 10); 
-});
+io.set('transports', ['xhr-polling']);
+io.set('polling duration', 10); 
 
 // Configuration
 app.configure(function(){
