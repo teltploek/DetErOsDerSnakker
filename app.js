@@ -14,6 +14,10 @@ var articleUrl = '';
 // Hook Socket.io into Express
 var io = require('socket.io').listen(server);
 
+io.configure('development', function(){
+  io.set('transports', ['xhr-polling']);
+});
+
 // Configuration
 app.configure(function(){
   app.set('views', __dirname + '/views');
