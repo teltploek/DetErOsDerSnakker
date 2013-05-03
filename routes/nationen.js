@@ -8,6 +8,7 @@
  */
 
 var request = require('request'),
+	cp = require('child_process'),
     cheerio = require('cheerio'),
     BufferList = require('bufferlist').BufferList,
     eventEmitter = require('events').EventEmitter,
@@ -430,7 +431,13 @@ Nationen.prototype._distributeSoundBites = function(){
 		if (commentObj.sound.length == 0){
 			var googleTTSFriendlyComment = this._splitCommentInGoogleTTSFriendlyBites(commentObj.body); // we need to split comment in to bulks of 100 characters
 
-			this._converCommentsToAudio(commentObj, googleTTSFriendlyComment);
+			var tts = cp.fork(__dirname + '/tts.js');
+
+			tts.on('message', function(data) {
+			  me.events.emit(data.message, data.commentObj);
+			});
+
+			tts.send({ commentObj : commentObj, googleTTSFriendlyComment : googleTTSFriendlyComment });
 		}else{
 			this.events.emit('tts:done:' + commentObj.id, commentObj);
 		}
@@ -497,80 +504,6 @@ Nationen.prototype._splitCommentInGoogleTTSFriendlyBites = function(comment){
 	}
 
 	return toSay;
-};
-
-/**
- * Transporting and keeping track of audio conversion
- *
- * @param {Object} The comment object in the form of the Article schema
- * @param {Array} The array holding Google TTS friendly comments
- * @api private
- */
-
-Nationen.prototype._converCommentsToAudio = function(commentObj, googleFriendlyCommentArr){
-	var me = this,
-		length = googleFriendlyCommentArr.length,
-	    conversionQueue = length,
-	    i;
-
-	for (i = 0; i < length; ++i){
-	  var idx = i,
-	      commentPart = googleFriendlyCommentArr[i];
-
-	  this._googleTextToSpeech('http://translate.google.com/translate_tts?deods='+idx+'&ie=utf-8&tl=da&q='+ commentPart, function(error, response, body){
-	    //if (error) return errorLogger.log('error', error);
-
-	    var comment64 = me._convertTTSResponseToBase64(response, body);
-
-	    // FIXME: Major hack to have soundbites arranged in correct order:
-	    //        We're passing along the original index in the uri. When the call returns we parse out the uri query in the response to refetch our index
-	    // 		  ... we need to rethink this - but right now, we want it working.
-	    // "First do it, then do it right, then do it better" - quote: Addy Osmani
-	    var soundBiteIdx = response.request.uri.query.split('&')[0].split('=')[1];
-
-	    commentObj.sound[soundBiteIdx] = comment64;
-
-	    conversionQueue = conversionQueue - 1;
-
-	    if (conversionQueue == 0){
-	      me.events.emit('tts:done:' + commentObj.id, commentObj);
-	    }
-	  });
-	}
-};
-
-/**
- * Executing the actual Google TTS request
- *
- * @param {String} The Google TTS url with params to call
- * @param {Function} The success callback
- * @api private
- */
-
-Nationen.prototype._googleTextToSpeech = function(url, callback){
-	request({ url : url, headers : { 'Referer' : '' }, encoding: 'binary' }, callback);
-};
-
-/**
- * Converting audio data to base64 string, or die trying
- *
- * @param {Object} The response object from the request
- * @param {String} The body retrieved by a http request
- * @api private
- */
-
-Nationen.prototype._convertTTSResponseToBase64 = function(response, body){
-	var data_uri_prefix = 'data:' + response.headers['content-type'] + ';base64,';
-
-	// try to handle response, or fail gracefully...
-	try{
-    	var comment64 = new Buffer(body.toString(), 'binary').toString('base64');
-	}
-	catch(e){ // ...by adding empty sound to base64 string
-		var comment64 = '/+MYxAAAAANIAUAAAASEEB/jwOFM/0MM/90b/+RhST//w4NFwOjf///PZu////9lns5GFDv//l9GlUIEEIAAAgIg8Ir/JGq3/+MYxDsLIj5QMYcoAP0dv9HIjUcH//yYSg';
-	}
-
-	return data_uri_prefix + comment64;
 };
 
 /**
