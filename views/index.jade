@@ -29,6 +29,19 @@ block body
           .beta
         p Nationen on roids!
       .row
+        //- browser-not-supported
+        .span12(ng-cloak,ng-show='state=="browser-not-supported"')
+          .centered
+            h3 Kun understøttet i Google Chrome
+
+            p DetErOsDerSnakker Beta anvender en masse nymodens stads.
+            p Dette stads har jeg endnu ikke haft tid til, at lave understøttelse for i andre browsere.
+            p Det ændrer sig sandsynligvis med tiden, men indtil videre kan du altså kun anvende denne service med Google Chrome.
+
+            p
+              a(href='http://www.google.com/intl/da/chrome/browser/', target='_blank')
+                img(src='/images/chrome.png')
+
         //- waiting - initial state
         .span12(ng-show='state=="waiting"')
           fieldset

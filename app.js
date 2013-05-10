@@ -5,7 +5,7 @@
 
 var express = require('express'),
     routes = require('./routes'),
-    Nationen = require('./routes/nationen.js');
+    Nationen = require('./local_modules/nationen.js');
 
 var app = module.exports = express();
 var server = require('http').createServer(app);

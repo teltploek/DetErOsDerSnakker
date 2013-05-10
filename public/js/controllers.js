@@ -2,7 +2,9 @@
 
 /* Controllers */
 function AppCtrl($scope, socket) {
-  $scope.state = 'waiting';
+  $.browser.chrome = /chrome/.test(navigator.userAgent.toLowerCase());
+
+  $scope.state = $.browser.chrome ? 'waiting' : 'browser-not-supported';
 
   $scope.articleData = {};
   $scope.numberOfComments = 0;
@@ -16,8 +18,10 @@ function AppCtrl($scope, socket) {
   $scope.messages = [];
   $scope.stateMessage = '';
   $scope.comments = [];
-
+  
   socket.on('post:fetched', function (allCommentsArr) {    
+    console.log(allCommentsArr);
+
     $scope.comments = allCommentsArr;
 
     $scope.messages.push({ text : 'Alle kommentarer til artiklen er færdigbehandlet - gør klar til højtlæsning...' });

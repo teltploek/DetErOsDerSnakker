@@ -55,6 +55,10 @@ var $ = (function (document, $) {
   return $;
 })(document);
 
+function numberOfComments(){
+  return 0;
+}
+
 function correctEnvironment(){
   var loc = location.href,
       matching = loc.match(/^(http:\/\/ekstrabladet\.dk)(.*)(\/article)(.*)(\.ece)$/g);
@@ -68,6 +72,8 @@ function returnTpl(){
   if (correctEnvironment()){
     var title = $('h1.rubrik').innerHTML,
         url = location.href.split('http://')[1];
+
+        // count comments
 
     content +='<div class="button-wrapper">';
       content +='<h1>'+title+'</h1>';

@@ -28,11 +28,6 @@ and point your browser to http://localhost:3000
 
 Right now everything is work in progress, so don't expect anything to work yet.
 
-## TODOs
-
-  * We might need to make request a child_process
-  * Show "Chrome desktop only" splash screen for other browsers
-
 ## Known issues
 
   * App isn't restarting when feed is done.
