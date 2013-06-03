@@ -20,8 +20,6 @@ function AppCtrl($scope, socket) {
   $scope.comments = [];
   
   socket.on('post:fetched', function (allCommentsArr) {    
-    console.log(allCommentsArr);
-
     $scope.comments = allCommentsArr;
 
     $scope.messages.push({ text : 'Alle kommentarer til artiklen er færdigbehandlet - gør klar til højtlæsning...' });

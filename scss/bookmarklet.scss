@@ -9,7 +9,7 @@
 	left:50%;
 	margin-left:-306px;
 	width:600px;
-	height:300px;
+	height:350px;
 	border:3px solid #222;
 	background-color:#fff;
 	z-index:9999999;
@@ -27,16 +27,20 @@
 	h1{
 		font-size: 18px;
 	}
-
+	h3{
+		font-size:12px;
+		margin-top:10px;
+		margin-bottom:20px;
+	}
 	p{
-		width:80%;
+		width:90%;
 		margin:0 auto;
 		display:inline-block;
 	}
 
 	.button-wrapper{
 		text-align: center;
-		height:155px;
+		height:195px;
 		width:auto;
 		position:relative;
 

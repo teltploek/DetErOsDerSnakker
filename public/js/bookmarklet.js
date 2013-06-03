@@ -1,9 +1,3 @@
-/*
- - Find out if we're on ekstrabladet dk and an article.
- - Close button
- - Background and logo as base64
- - jQuery animations
-*/
 var $ = (function (document, $) {
   var element = Element.prototype,
       nodeList = NodeList.prototype,
@@ -55,8 +49,23 @@ var $ = (function (document, $) {
   return $;
 })(document);
 
+String.prototype.fulltrim=function(){return this.replace(/(?:(?:^|\n)\s+|\s+(?:$|\n))/g,'').replace(/\s+/g,' ');};
+
 function numberOfComments(){
-  return 0;
+  var comments = 0,
+      btn = $('.btn-social.btn-comment');
+
+  if (btn.length){
+    btn = btn[0];
+
+    var html = btn.innerHTML.fulltrim();
+
+    comments = html.split('<')[0];
+
+    comments = parseInt(comments);
+  }
+
+  return comments;
 }
 
 function correctEnvironment(){
@@ -75,11 +84,20 @@ function returnTpl(){
 
         // count comments
 
-    content +='<div class="button-wrapper">';
-      content +='<h1>'+title+'</h1>';
-      content +='<p>Tryk p&aring; knappen herunder for at f&aring; Nationen-kommentarerne l&aelig;st h&oslash;jt.';
-      content +='<input type="submit" class="button" value="G&aring; til h&oslash;jtl&aelig;sning" onclick="location.href=\'http://deterosdersnakker.dk\/?a='+url+'\';" />';
-    content +='</div>';
+    if (numberOfComments()){
+      content +='<div class="button-wrapper">';
+        content +='<h1>'+title+'</h1>';
+        content +='<h3>'+numberOfComments()+' kommentarer</h3>';
+        content +='<p>Tryk p&aring; knappen herunder for at f&aring; Nationen-kommentarerne l&aelig;st h&oslash;jt.';
+        content +='<input type="submit" class="button" value="G&aring; til h&oslash;jtl&aelig;sning" onclick="location.href=\'http://deterosdersnakker.dk\/?a='+url+'\';" />';
+      content +='</div>';
+    }else{
+      content +='<div class="button-wrapper">';
+        content +='<h1>'+title+'</h1>';
+        content +='<p>Der er desv&aelig;rre ingen kommentarer til denne artikel.';
+        content +='<input type="button" class="button" value="G&aring; til ekstrabladet.dk" onclick="location.href=\'http://ekstrabladet.dk\';"  />';
+      content +='</div>';
+    }
   }else{
     content +='<div class="button-wrapper">';
       content +='<h1>&AElig;V!</h1>';
