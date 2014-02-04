@@ -1,6 +1,6 @@
 {
     "name": "DetErOsDerSnakker",
-    "version": "0.0.9-13",
+    "version": "0.0.9-14",
     "author": {
         "name": "Brian Frisch",
         "email": "brian@frisch.io",
@@ -8,9 +8,9 @@
     },
     "private": false,
     "dependencies": {
-        "express": "3.0.0",
-        "jade": ">= 0.0.1",
-        "socket.io": ">= 0.9.6",
+        "express": "~3.0.0",
+        "jade": "~0.35.0",
+        "socket.io": "~0.9.6",
         "request": "*",
         "cheerio": "*",
         "bufferlist": "*",
@@ -19,7 +19,7 @@
         "mongoose": "latest"
     },
     "devDependencies": {
-        "grunt": "*",
+        "grunt": "~0.3.x",
         "grunt-compass": "*",
         "compass": "*"
     },
